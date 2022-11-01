@@ -1,12 +1,15 @@
 package repos
 
-import "github.com/h4n-openschool/classes/models"
+import (
+	"github.com/h4n-openschool/classes/models"
+	"github.com/h4n-openschool/classes/utils"
+)
 
 // ClassRepository defines a common interface for querying Class data
 type ClassRepository interface {
 	// GetAll returns all of the available Class items, paginated based on the
 	// passed arguments.
-	GetAll(perPage int, page int) ([]models.Class, error)
+	GetAll(pq utils.PaginationQuery) ([]models.Class, error)
 
 	// Get returns a single Class by its ID.
 	Get(id string) (*models.Class, error)

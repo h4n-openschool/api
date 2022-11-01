@@ -6,6 +6,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/h4n-openschool/classes/repos"
+	"github.com/h4n-openschool/classes/utils"
 	"github.com/lucsky/cuid"
 )
 
@@ -36,5 +37,23 @@ func GetClass(repo repos.ClassRepository) gin.HandlerFunc {
 		}
 
 		ctx.JSON(http.StatusOK, gin.H{"class": class})
+	}
+}
+
+func GetClasses(repo repos.ClassRepository) gin.HandlerFunc {
+	return func(ctx *gin.Context) {
+		pagination := utils.NewPaginationQuery()
+		pagination.Read(ctx)
+
+		classes, err := repo.GetAll(pagination)
+		if err != nil {
+			ctx.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
+				"error": "Something went wrong. Ask your administrator to check the server logs.",
+			})
+			log.Println(err)
+			return
+		}
+
+		ctx.JSON(http.StatusOK, gin.H{"classes": classes, "pagination": pagination})
 	}
 }

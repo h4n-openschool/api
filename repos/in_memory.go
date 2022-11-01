@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/h4n-openschool/classes/models"
+	"github.com/h4n-openschool/classes/utils"
 	"github.com/lucsky/cuid"
 )
 
@@ -33,15 +34,11 @@ func NewInMemoryClassRepository(itemCount int) InMemoryClassRepository {
 	return InMemoryClassRepository{Items: items}
 }
 
-func (r *InMemoryClassRepository) GetAll(perPage int, page int) ([]models.Class, error) {
+func (r *InMemoryClassRepository) GetAll(pq utils.PaginationQuery) ([]models.Class, error) {
 	var items []models.Class
 
-	offset := (page - 1) * perPage
-	if page == 1 {
-		offset = 0
-	}
-
-	for i := offset; i < (offset + perPage); i++ {
+	offset := pq.Offset()
+	for i := offset; i < (offset + pq.PerPage); i++ {
 		item := r.Items[i]
 		items = append(items, item)
 	}
