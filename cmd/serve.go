@@ -5,8 +5,11 @@ package cmd
 
 import (
 	"github.com/gin-gonic/gin"
+	"github.com/h4n-openschool/classes/handlers"
+	"github.com/h4n-openschool/classes/repos"
 	"github.com/h4n-openschool/server"
 	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
 )
 
 // serveCmd represents the serve command
@@ -15,19 +18,14 @@ var serveCmd = &cobra.Command{
 	Short: "Start the Classes server",
 	RunE: func(cmd *cobra.Command, args []string) error {
 		// Read a configured address from the command line
-		addr, err := cmd.Flags().GetString("addr")
-		if err != nil {
-			return err
-		}
+		addr := viper.GetString("addr")
+
+		cr := repos.NewInMemoryClassRepository(50)
 
 		// Create a new Gin router instance
 		e := gin.Default()
 
-		e.GET("/hello", func(ctx *gin.Context) {
-			ctx.JSON(200, map[string]string{
-				"hello": "world!",
-			})
-		})
+		e.GET("/classes/:id", handlers.GetClass(&cr))
 
 		// Create the server using the Gin handler
 		s := server.Server{
@@ -45,4 +43,5 @@ func init() {
 
 	// Create a flag to hold the listen address for the server
 	serveCmd.Flags().String("addr", "0.0.0.0:http", "The address to open a TCP listener on.")
+	viper.BindPFlag("addr", serveCmd.Flags().Lookup("addr"))
 }

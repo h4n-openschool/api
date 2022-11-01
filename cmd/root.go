@@ -49,16 +49,15 @@ func initConfig() {
 		// Use config file from the flag.
 		viper.SetConfigFile(cfgFile)
 	} else {
-		// Find home directory.
-		home, err := os.UserHomeDir()
-		cobra.CheckErr(err)
-
-		// Search config in home directory with name ".classes" (without extension).
-		viper.AddConfigPath(fmt.Sprintf("%v/.config/classes", home))
-		viper.AddConfigPath("/etc/openschool/classes")
+		viper.SetEnvPrefix("os_classes")
 
 		viper.SetConfigType("yaml")
-		viper.SetConfigName("config.yaml")
+		viper.SetConfigName("config")
+
+		// Search config in home directory inside the XDG_CONFIG_ROOT
+		viper.AddConfigPath("$HOME/.config/openschool/classes")
+		viper.AddConfigPath("/etc/openschool/classes")
+		viper.AddConfigPath(".")
 	}
 
 	viper.AutomaticEnv() // read in environment variables that match

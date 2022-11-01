@@ -5,6 +5,7 @@ go 1.19
 require (
 	github.com/gin-gonic/gin v1.8.1
 	github.com/h4n-openschool/server v0.0.0-20221101175249-c895d88cc2ab
+	github.com/lucsky/cuid v1.2.1
 	github.com/spf13/cobra v1.6.1
 	github.com/spf13/viper v1.13.0
 )
