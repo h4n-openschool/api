@@ -1,8 +1,11 @@
-/*
-Copyright © 2022 NAME HERE <EMAIL ADDRESS>
-
-*/
 package main
+
+// @title Classes Service
+// @version 1.0
+// @description This spec describes the HTTP Classes microservice interface.
+
+// @tag.name classes
+// @tag.description Endpoints that expose class information.
 
 import "github.com/h4n-openschool/classes/cmd"
 

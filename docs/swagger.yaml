@@ -1,0 +1,30 @@
+info:
+  contact: {}
+  description: This spec describes the HTTP Classes microservice interface.
+  title: Classes Service
+  version: "1.0"
+paths:
+  /classes:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+      summary: Get a paginated list of classes
+      tags:
+      - classes
+  /classes/:id:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+      summary: Get a class by ID
+      tags:
+      - classes
+swagger: "2.0"
+tags:
+- description: Endpoints that expose class information.
+  name: classes

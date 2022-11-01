@@ -1,6 +1,3 @@
-/*
-Copyright © 2022 NAME HERE <EMAIL ADDRESS>
-*/
 package cmd
 
 import (
@@ -43,13 +40,17 @@ var serveCmd = &cobra.Command{
 		})
 
 		// Register routes
-		e.GET("/classes", handlers.GetClasses(&cr))   // list all classes
-		e.GET("/classes/:id", handlers.GetClass(&cr)) // get class by id
+		classes := e.Group("/classes")
+		{
+			classes.GET("/", handlers.GetClasses(&cr))   // list all classes
+			classes.GET("/:id", handlers.GetClass(&cr))  // get class by id
+			classes.POST("/", handlers.CreateClass(&cr)) // create new class
+		}
 
 		// Create an HTTP server instance using the Gin handler
 		s := server.Server{
 			Addr:    addr,
-			Handler: e.Handler(),
+			Handler: e,
 		}
 
 		// Have the server start serving Gin requests on the listen address

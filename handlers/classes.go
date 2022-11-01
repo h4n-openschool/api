@@ -11,6 +11,15 @@ import (
 	"github.com/lucsky/cuid"
 )
 
+// @BasePath /classes
+
+// GetClass godoc
+// @Summary Get a class by ID
+// @Schemes
+// @Tags classes
+// @Produce json
+// @Success 200
+// @Router /classes/:id [get]
 func GetClass(repo repos.ClassRepository) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		id := ctx.Param("id")
@@ -41,6 +50,13 @@ func GetClass(repo repos.ClassRepository) gin.HandlerFunc {
 	}
 }
 
+// GetClasses godoc
+// @Summary Get a paginated list of classes
+// @Schemes
+// @Tags classes
+// @Produce json
+// @Success 200
+// @Router /classes [get]
 func GetClasses(repo repos.ClassRepository) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		pagination := utils.NewPaginationQuery()
