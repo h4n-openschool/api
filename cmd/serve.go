@@ -1,7 +1,9 @@
 package cmd
 
 import (
+	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
+	"github.com/h4n-openschool/classes/bus"
 	"github.com/h4n-openschool/classes/handlers"
 	"github.com/h4n-openschool/classes/repos"
 	"github.com/h4n-openschool/server"
@@ -24,8 +26,20 @@ var serveCmd = &cobra.Command{
 		// to generate 50 classes at once.
 		cr := repos.NewInMemoryClassRepository(50)
 
+    // Create a new message bus instance
+    b := bus.GetOrCreateBus()
+
+    // Try to connect to the message bus or fail on error
+    if err := b.Connect(); err != nil {
+      return err
+    }
+
 		// Create a new Gin router instance
 		e := gin.Default()
+
+    corsConf := cors.DefaultConfig()
+    corsConf.AllowAllOrigins = true
+    e.Use(cors.New(corsConf))
 
 		e.GET("/debug", func(ctx *gin.Context) {
 			// This handler will return arrays of all mocked data so that the

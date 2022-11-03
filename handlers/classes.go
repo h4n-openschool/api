@@ -5,7 +5,6 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	"github.com/h4n-openschool/classes/models"
 	"github.com/h4n-openschool/classes/repos"
 	"github.com/h4n-openschool/classes/utils"
 	"github.com/lucsky/cuid"
@@ -72,36 +71,5 @@ func GetClasses(repo repos.ClassRepository) gin.HandlerFunc {
 		}
 
 		ctx.JSON(http.StatusOK, gin.H{"classes": classes, "pagination": pagination})
-	}
-}
-
-type CreateClassDto struct {
-	Name        string `json:"name"`
-	DisplayName string `json:"displayName"`
-	Description string `json:"description,omitempty"`
-}
-
-func CreateClass(repo repos.ClassRepository) gin.HandlerFunc {
-	return func(ctx *gin.Context) {
-		body := CreateClassDto{}
-		if err := ctx.BindJSON(&body); err != nil {
-			ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-			return
-		}
-
-		in := models.Class{
-			Name:        body.Name,
-			DisplayName: body.DisplayName,
-			Description: body.Description,
-		}
-
-		class, err := repo.Create(in)
-		if err != nil {
-			ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-		}
-
-		ctx.JSON(http.StatusCreated, gin.H{
-			"class": class,
-		})
 	}
 }
