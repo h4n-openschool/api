@@ -34,13 +34,9 @@ Then, you need to start a copy of RabbitMQ in Docker.
 ```shell
 docker run \
     -d \             # run in the background
-    -p 15672:15672 \ # the web ui port
     -p 5672:5672 \   # the amqp port
     rabbitmq
 ```
-
-You should be able to browse to http://127.0.0.1:15672/ and log in as
-`guest:guest`.
 
 Now, you can run the server software (still inside the nix shell).
 
@@ -49,4 +45,3 @@ go run . serve
 ```
 
 By default, it will be running on port 8001, bound only to the local interface.
-
