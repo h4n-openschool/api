@@ -1,4 +1,4 @@
-package handlers
+package classes
 
 import (
 	"log"
@@ -21,7 +21,10 @@ import (
 // @Router /classes/:id [get]
 func GetClass(repo repos.ClassRepository) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
+    // Get the ID from the route parameter
 		id := ctx.Param("id")
+
+    // Validate the ID is a CUID
 		if err := cuid.IsCuid(id); err != nil {
 			ctx.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
 				"error": "Invalid ID, must be a cuid.",
@@ -29,6 +32,7 @@ func GetClass(repo repos.ClassRepository) gin.HandlerFunc {
 			return
 		}
 
+    // Get a class by its CUID (passed in route params)
 		class, err := repo.Get(id)
 		if err != nil {
 			ctx.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
@@ -38,6 +42,7 @@ func GetClass(repo repos.ClassRepository) gin.HandlerFunc {
 			return
 		}
 
+    // If the class doesn't exist, 404
 		if class == nil {
 			ctx.AbortWithStatusJSON(http.StatusNotFound, gin.H{
 				"error": "No such class exists.",
@@ -45,6 +50,7 @@ func GetClass(repo repos.ClassRepository) gin.HandlerFunc {
 			return
 		}
 
+    // Respond with the class
 		ctx.JSON(http.StatusOK, gin.H{"class": class})
 	}
 }

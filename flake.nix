@@ -31,7 +31,7 @@
             pname = "classes";
             inherit version;
             src = ./.;
-            vendorSha256 = "sha256-qPTUYTSWPyI6XyzGiDfUrZdOwrfNCYmgoVH5H1LwOtw=";
+            vendorSha256 = null;
           };
         });
 

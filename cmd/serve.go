@@ -4,8 +4,8 @@ import (
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/h4n-openschool/classes/bus"
-	"github.com/h4n-openschool/classes/handlers"
 	"github.com/h4n-openschool/classes/repos"
+	"github.com/h4n-openschool/classes/handlers/classes"
 	"github.com/h4n-openschool/server"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -54,11 +54,11 @@ var serveCmd = &cobra.Command{
 		})
 
 		// Register routes
-		classes := e.Group("/classes")
+		classEndpoints := e.Group("/classes")
 		{
-			classes.GET("/", handlers.GetClasses(&cr))   // list all classes
-			classes.GET("/:id", handlers.GetClass(&cr))  // get class by id
-			classes.POST("/", handlers.CreateClass(&cr)) // create new class
+			classEndpoints.GET("/", classes.GetClasses(&cr))   // list all classes
+			classEndpoints.GET("/:id", classes.GetClass(&cr))  // get class by id
+			classEndpoints.POST("/", classes.CreateClass(&cr)) // create new class
 		}
 
 		// Create an HTTP server instance using the Gin handler

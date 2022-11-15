@@ -31,7 +31,7 @@ func NewInMemoryClassRepository(itemCount int) InMemoryClassRepository {
 		})
 	}
 
-	return InMemoryClassRepository{Items: items}
+  return InMemoryClassRepository{Items: items}
 }
 
 func (r *InMemoryClassRepository) GetAll(pq utils.PaginationQuery) ([]models.Class, error) {
