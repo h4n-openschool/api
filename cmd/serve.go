@@ -4,7 +4,7 @@ import (
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/h4n-openschool/classes/bus"
-	"github.com/h4n-openschool/classes/repos"
+	classRepos "github.com/h4n-openschool/classes/repos/classes"
 	"github.com/h4n-openschool/classes/handlers/classes"
 	"github.com/h4n-openschool/server"
 	"github.com/spf13/cobra"
@@ -24,7 +24,7 @@ var serveCmd = &cobra.Command{
 		// NOTE: For the purposes of mocking, the InMemoryClassRepository will
 		// generate a number of classes at random. In this case, we instruct it
 		// to generate 50 classes at once.
-		cr := repos.NewInMemoryClassRepository(50)
+		cr := classRepos.NewInMemoryClassRepository(50)
 
     // Create a new message bus instance
     b := bus.GetOrCreateBus()

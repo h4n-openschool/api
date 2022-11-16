@@ -1,4 +1,4 @@
-package repos
+package classes
 
 import (
 	"github.com/h4n-openschool/classes/models"

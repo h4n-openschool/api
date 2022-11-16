@@ -5,7 +5,7 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	"github.com/h4n-openschool/classes/repos"
+	repos "github.com/h4n-openschool/classes/repos/classes"
 	"github.com/h4n-openschool/classes/utils"
 	"github.com/lucsky/cuid"
 )
