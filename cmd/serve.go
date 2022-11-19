@@ -1,14 +1,15 @@
 package cmd
 
 import (
+	middleware "github.com/deepmap/oapi-codegen/pkg/gin-middleware"
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/h4n-openschool/classes/api"
 	"github.com/h4n-openschool/classes/bus"
 	"github.com/h4n-openschool/classes/handlers"
-  middleware "github.com/deepmap/oapi-codegen/pkg/gin-middleware"
 	classRepos "github.com/h4n-openschool/classes/repos/classes"
 	"github.com/h4n-openschool/classes/server"
+	"github.com/h4n-openschool/classes/utils"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )
@@ -43,7 +44,10 @@ var serveCmd = &cobra.Command{
 
     // Add request validation from codegen
     swagger, _ := api.GetSwagger()
-    e.Use(middleware.OapiRequestValidator(swagger))
+    opts := middleware.Options{
+      ErrorHandler: utils.ValidatorFunc,
+    }
+    e.Use(middleware.OapiRequestValidatorWithOptions(swagger, &opts))
 
     // Create Service Interface for codegen-based endpoint configuration
     si := handlers.OpenSchoolImpl{

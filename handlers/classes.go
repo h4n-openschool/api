@@ -60,7 +60,7 @@ func (i *OpenSchoolImpl) ClassesList(ctx *gin.Context, params api.ClassesListPar
 func (i *OpenSchoolImpl) ClassesCreate(ctx *gin.Context) {
   var body api.ClassesCreateRequest
   if err := ctx.BindJSON(&body); err != nil {
-    utils.ErrValidation(ctx, err)
+    _ = ctx.AbortWithError(400, err)
     return
   }
 
