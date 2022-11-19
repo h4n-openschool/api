@@ -6,7 +6,7 @@ import (
 	"github.com/h4n-openschool/classes/bus"
 	classRepos "github.com/h4n-openschool/classes/repos/classes"
 	"github.com/h4n-openschool/classes/handlers/classes"
-	"github.com/h4n-openschool/server"
+	"github.com/h4n-openschool/classes/server"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )
