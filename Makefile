@@ -8,3 +8,5 @@ update-pkgs:
 	go mod tidy
 	go mod vendor
 
+openapi:
+	@oapi-codegen --config .oapi-codegen.yaml api/spec.yaml

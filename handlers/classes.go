@@ -1,13 +1,17 @@
 package handlers
 
 import (
+	"encoding/json"
 	"log"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
 	"github.com/h4n-openschool/classes/api"
+	"github.com/h4n-openschool/classes/bus"
 	"github.com/h4n-openschool/classes/models"
 	"github.com/h4n-openschool/classes/utils"
+	"github.com/rabbitmq/amqp091-go"
+  "github.com/gosimple/slug"
 )
 
 // ClassesList implements the classesList operation from the OpenAPI
@@ -53,3 +57,65 @@ func (i *OpenSchoolImpl) ClassesList(ctx *gin.Context, params api.ClassesListPar
 	ctx.JSON(http.StatusOK, response)
 }
 
+func (i *OpenSchoolImpl) ClassesCreate(ctx *gin.Context) {
+  var body api.ClassesCreateRequest
+  if err := ctx.BindJSON(&body); err != nil {
+    utils.ErrValidation(ctx, err)
+    return
+  }
+
+  in := models.Class{
+    DisplayName: body.DisplayName,
+  }
+
+  if body.Name != nil {
+    in.Name = *body.Name
+  } else {
+    in.Name = slug.Make(body.DisplayName)
+  }
+
+  if body.Description != nil {
+    in.Description = body.Description
+  }
+
+  c, q, err := i.Bus.ChannelQueue()
+  if err != nil {
+    ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+  }
+
+  class, err := i.Repository.Create(in)
+  if err != nil {
+    ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+  }
+
+  ev := bus.Event[*models.Class]{
+    Data: class,
+    Metadata: bus.EventMeta{
+      Type:     "create",
+      Resource: "class",
+    },
+  }
+
+  j, _ := json.Marshal(ev)
+
+  err = c.PublishWithContext(
+    ctx.Request.Context(),
+    "",
+    q.Name,
+    false,
+    false,
+    amqp091.Publishing{
+      ContentType: "application/json",
+      Body:        j,
+    },
+  )
+  if err != nil {
+    ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+  }
+
+  response := api.ClassesCreateResponse{
+    Class: class.AsApiClass(),
+  }
+
+  ctx.JSON(http.StatusCreated, response)
+}

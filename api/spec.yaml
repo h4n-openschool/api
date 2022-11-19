@@ -35,6 +35,30 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
 
+    post:
+      operationId: classesCreate
+      summary: Create a new class
+      tags: [classes, v1]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ClassesCreateRequest'
+      responses:
+        '201':
+          description: The created class, populated with metadata.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ClassesCreateResponse'
+        500:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
 components:
   schemas:
     PaginationData:
@@ -128,6 +152,32 @@ components:
         classes:
           $ref: '#/components/schemas/ClassList'
 
+    ClassesCreateRequest:
+      type: object
+      required:
+        - displayName
+      properties:
+        name:
+          type: string
+          description: The name of the Class
+          example: mathsOneOhOne
+        displayName:
+          type: string
+          description: The display name of the Class
+          example: Maths 101
+        description:
+          type: string
+          description: The description of the Class
+          example: Basic maths class
+
+    ClassesCreateResponse:
+      type: object
+      required:
+        - class
+      properties:
+        class:
+          $ref: '#/components/schemas/Class'
+
     Error:
       type: object
       required:
@@ -142,4 +192,22 @@ components:
           description: A human readable error message
           type: string
           example: 'Not found'
+
+    MultiError:
+      type: object
+      required:
+        - code
+        - messages
+      properties:
+        code:
+          description: The HTTP error code
+          type: integer
+          example: 404
+          minimum: 400
+          maximum: 599
+        messages:
+          type: array
+          items:
+            type: string
+            description: A human readable error message
 

@@ -7,6 +7,7 @@ require (
 	github.com/getkin/kin-openapi v0.107.0
 	github.com/gin-gonic/gin v1.8.1
 	github.com/golangci/golangci-lint v1.50.1
+	github.com/gosimple/slug v1.13.1
 	github.com/lucsky/cuid v1.2.1
 	github.com/spf13/cobra v1.6.1
 	github.com/spf13/cobra-cli v1.3.0
@@ -75,6 +76,7 @@ require (
 	github.com/google/uuid v1.3.0 // indirect
 	github.com/gordonklaus/ineffassign v0.0.0-20210914165742-4cc7213b9bc8 // indirect
 	github.com/gorilla/mux v1.8.0 // indirect
+	github.com/gosimple/unidecode v1.0.1 // indirect
 	github.com/gostaticanalysis/analysisutil v0.7.1 // indirect
 	github.com/gostaticanalysis/comment v1.4.2 // indirect
 	github.com/gostaticanalysis/forcetypeassert v0.1.0 // indirect

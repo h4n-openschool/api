@@ -3,7 +3,6 @@ package classes
 import (
 	"errors"
 	"fmt"
-	"log"
 	"time"
 
 	"github.com/h4n-openschool/classes/models"
@@ -20,12 +19,14 @@ func NewInMemoryClassRepository(itemCount int) InMemoryClassRepository {
 
 	for i := 0; i < itemCount; i++ {
 		id := cuid.New()
-		log.Println(id)
+
+    desc := fmt.Sprintf(`This is class %v`, i)
+
 		items = append(items, models.Class{
 			Id:          id,
 			Name:        fmt.Sprintf(`class-%v`, i),
 			DisplayName: fmt.Sprintf(`Class %v`, i),
-			Description: fmt.Sprintf(`This is class %v`, i),
+			Description: &desc,
 			CreatedAt:   time.Now(),
 			UpdatedAt:   time.Now(),
 		})

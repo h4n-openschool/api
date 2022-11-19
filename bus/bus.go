@@ -146,4 +146,3 @@ func (b *Bus) ChannelQueue() (ch *amqp091.Channel, qu amqp091.Queue, err error) 
 
   return
 }
-

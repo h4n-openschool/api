@@ -18,7 +18,7 @@ type Class struct {
 	DisplayName string `json:"display_name"`
 
 	// Description is the human-readable description of what the class teaches.
-	Description string `json:"description"`
+	Description *string `json:"description"`
 
 	// CreatedAt is the time at which this class was created.
 	CreatedAt time.Time `json:"created_at"`
@@ -32,7 +32,7 @@ func (c *Class) AsApiClass() api.Class {
     Id: c.Id,
     Name: c.Name,
     DisplayName: c.DisplayName,
-    Description: c.Description,
+    Description: *c.Description,
     CreatedAt: c.CreatedAt.Format(time.RFC3339),
     UpdatedAt: c.UpdatedAt.Format(time.RFC3339),
   }
