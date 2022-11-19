@@ -1,7 +1,6 @@
 package handlers
 
 import (
-	"fmt"
 	"log"
 	"net/http"
 
@@ -30,6 +29,7 @@ func (i *OpenSchoolImpl) ClassesList(ctx *gin.Context, params api.ClassesListPar
 		log.Println(err)
 		return
 	}
+
   total, err := i.Repository.Count()
   if err != nil {
 		ctx.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
@@ -39,22 +39,14 @@ func (i *OpenSchoolImpl) ClassesList(ctx *gin.Context, params api.ClassesListPar
 		return
   }
 
-  paginationResponse := api.PaginationData{
-    Total: total,
-    Page: pagination.Page,
-    PerPage: pagination.PerPage,
-    FirstUrl: "/v1/classes?page=1",
-    LastUrl: fmt.Sprintf("/v1/classes?page=%v", total / pagination.PerPage),
-    NextUrl: fmt.Sprintf("/v1/classes?page=%v", pagination.Page + 1),
-    PrevUrl: fmt.Sprintf("/v1/classes?page=%v", pagination.Page - 1),
-  }
-
+  paginationData := utils.GeneratePaginationData("/v1/classes", total, pagination)
   classList := models.ClassesAsApiClassList(classes)
 
   response := api.ClassesListResponse{
     Classes: classList,
-    Pagination: paginationResponse,
+    Pagination: paginationData,
   }
 
 	ctx.JSON(http.StatusOK, response)
 }
+
