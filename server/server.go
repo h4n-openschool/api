@@ -64,13 +64,16 @@ func (s *Server) handleConnection(c net.Conn) {
 
 	r, err := http.ReadRequest(reader)
 	if err != nil {
+    log.Fatalf("failed to read request: %v", err.Error())
 		return
 	}
 
 	if res := validRequest(r); res != nil {
-		res.Write(c)
-		c.Close()
-		return
+    if err := res.Write(c); err != nil {
+      log.Fatalf("failed to write response: %v", err.Error())
+      return
+    }
+    return
 	}
 
 	w := NewOSResponseWriter()
@@ -87,5 +90,4 @@ func (s *Server) handleConnection(c net.Conn) {
 		log.Fatalf("failed to write response: %v", err.Error())
 		return
 	}
-	c.Close()
 }

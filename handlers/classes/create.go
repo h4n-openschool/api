@@ -66,7 +66,8 @@ func CreateClass(repo repos.ClassRepository) gin.HandlerFunc {
 
 		j, _ := json.Marshal(ev)
 
-		err = c.Publish(
+		err = c.PublishWithContext(
+      ctx.Request.Context(),
 			"",
 			q.Name,
 			false,

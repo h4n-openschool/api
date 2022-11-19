@@ -71,5 +71,8 @@ func init() {
 
 	// Create a flag to hold the listen address for the server
 	serveCmd.Flags().String("addr", "0.0.0.0:http", "The address to open a TCP listener on.")
-	viper.BindPFlag("addr", serveCmd.Flags().Lookup("addr"))
+  err := viper.BindPFlag("addr", serveCmd.Flags().Lookup("addr"))
+  if err != nil {
+    panic(err)
+  }
 }

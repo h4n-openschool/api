@@ -24,6 +24,4 @@ func ErrValidation(ctx *gin.Context, err error) {
 	}
 
 	ctx.JSON(http.StatusBadRequest, gin.H{"error": "validation failed", "fields": errs})
-
-	return
 }
