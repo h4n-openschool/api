@@ -35,9 +35,6 @@ github.com/goccy/go-json/internal/encoder/vm_color_indent
 github.com/goccy/go-json/internal/encoder/vm_indent
 github.com/goccy/go-json/internal/errors
 github.com/goccy/go-json/internal/runtime
-# github.com/h4n-openschool/server v0.0.0-20221101175249-c895d88cc2ab
-## explicit; go 1.19
-github.com/h4n-openschool/server
 # github.com/hashicorp/hcl v1.0.0
 ## explicit
 github.com/hashicorp/hcl
