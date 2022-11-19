@@ -37,6 +37,15 @@ func (pq *PaginationQuery) Read(ctx *gin.Context) {
 	}
 }
 
+func (pq *PaginationQuery) ReadFromOptional(page *int, perPage *int) {
+  if page != nil {
+    pq.Page = *page
+  }
+  if perPage != nil {
+    pq.PerPage = *perPage
+  }
+}
+
 func (pq PaginationQuery) Offset() int {
 	if pq.Page == 0 {
 		pq.Page = 1

@@ -110,3 +110,8 @@ func (r *InMemoryClassRepository) Delete(class models.Class) error {
 
 	return nil
 }
+
+func (r *InMemoryClassRepository) Count() (int, error) {
+  return len(r.Items), nil
+}
+

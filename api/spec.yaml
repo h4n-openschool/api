@@ -1,0 +1,145 @@
+openapi: '3.0.0'
+info:
+  version: '1.0.0'
+  title: 'OpenSchool API'
+  description: Interact with your childrens' teachers and their classes.
+
+paths:
+  /v1/classes:
+    get:
+      operationId: classesList
+      summary: List all classes
+      tags: [classes, v1]
+      parameters:
+        - in: query
+          name: perPage
+          schema:
+            type: integer
+          description: The number of results to retrieve in each page.
+        - in: query
+          name: page
+          schema:
+            type: integer
+          description: The page to load.
+      responses:
+        '200':
+          description: A list of classes and pagination details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ClassesListResponse'
+        500:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+components:
+  schemas:
+    PaginationData:
+      type: object
+      required:
+        - page
+        - perPage
+        - total
+        - nextUrl
+        - prevUrl
+        - firstUrl
+        - lastUrl
+      properties:
+        page:
+          type: integer
+          minimum: 1
+          example: 2
+        perPage:
+          type: integer
+          minimum: 1
+          maximum: 100
+          example: 25
+        total:
+          type: integer
+          minimum: 0
+          example: 75
+        nextUrl:
+          type: string
+          example: /v1/classes?page=3
+        prevUrl:
+          type: string
+          example: /v1/classes?page=1
+        firstUrl:
+          type: string
+          example: /v1/classes?page=1
+        lastUrl:
+          type: string
+          example: /v1/classes?page=3
+
+    Cuid:
+      type: string
+      description: A cuid
+      example: cjld2cjxh0000qzrmn831i7rn
+
+    DateTime:
+      type: string
+      description: An RFC3339 date/time string
+      example: '1985-04-12T23:20:50.52Z'
+
+    Class:
+      type: object
+      required:
+        - id
+        - name
+        - displayName
+        - description
+        - createdAt
+        - updatedAt
+      properties:
+        id:
+          $ref: '#/components/schemas/Cuid'
+        name:
+          type: string
+          example: mathsOneOhOne
+        displayName:
+          type: string
+          example: Maths 101
+        description:
+          type: string
+          example: Basic maths class
+        createdAt:
+          $ref: '#/components/schemas/DateTime'
+        updatedAt:
+          $ref: '#/components/schemas/DateTime'
+
+    ClassList:
+      description: An array of Classes
+      type: array
+      items:
+        $ref: '#/components/schemas/Class'
+
+    ClassesListResponse:
+      description: The response for the /v1/classes endpoint
+      type: object
+      required:
+        - pagination
+        - classes
+      properties:
+        pagination:
+          $ref: '#/components/schemas/PaginationData'
+        classes:
+          $ref: '#/components/schemas/ClassList'
+
+    Error:
+      type: object
+      required:
+        - code
+        - message
+      properties:
+        code:
+          description: The HTTP error code
+          type: integer
+          example: 404
+        message:
+          description: A human readable error message
+          type: string
+          example: 'Not found'
+

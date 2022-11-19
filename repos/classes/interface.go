@@ -26,4 +26,7 @@ type ClassRepository interface {
 	// Delete takes a class object that includes at least an ID and deletes the
 	// relevant record for it in the data store.
 	Delete(class models.Class) error
+
+  // Count returns the total number of classes in the datastore.
+  Count() (int, error)
 }

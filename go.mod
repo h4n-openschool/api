@@ -4,6 +4,7 @@ go 1.19
 
 require (
 	github.com/deepmap/oapi-codegen v1.12.2
+	github.com/getkin/kin-openapi v0.107.0
 	github.com/gin-gonic/gin v1.8.1
 	github.com/lucsky/cuid v1.2.1
 	github.com/spf13/cobra v1.6.1
@@ -12,9 +13,11 @@ require (
 )
 
 require (
-	github.com/getkin/kin-openapi v0.107.0 // indirect
+	github.com/apapsch/go-jsonmerge/v2 v2.0.0 // indirect
 	github.com/go-openapi/jsonpointer v0.19.5 // indirect
 	github.com/go-openapi/swag v0.21.1 // indirect
+	github.com/google/uuid v1.3.0 // indirect
+	github.com/gorilla/mux v1.8.0 // indirect
 	github.com/invopop/yaml v0.1.0 // indirect
 	github.com/josharian/intern v1.0.0 // indirect
 	github.com/labstack/echo/v4 v4.9.1 // indirect

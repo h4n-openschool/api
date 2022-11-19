@@ -1,5 +1,5 @@
 ---
-addr: '0.0.0.0:8001' # override the address for development purposes
+addr: '0.0.0.0:8080' # override the address for development purposes
 
 amqp:
   dsn: 'amqp://guest:guest@localhost:5672/'

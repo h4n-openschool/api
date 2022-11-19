@@ -3,9 +3,11 @@ package cmd
 import (
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
+	"github.com/h4n-openschool/classes/api"
 	"github.com/h4n-openschool/classes/bus"
+	"github.com/h4n-openschool/classes/handlers"
+  middleware "github.com/deepmap/oapi-codegen/pkg/gin-middleware"
 	classRepos "github.com/h4n-openschool/classes/repos/classes"
-	"github.com/h4n-openschool/classes/handlers/classes"
 	"github.com/h4n-openschool/classes/server"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -20,10 +22,7 @@ var serveCmd = &cobra.Command{
 		// or any detected config file.
 		addr := viper.GetString("addr")
 
-		// Instantiate a new Class repository
-		// NOTE: For the purposes of mocking, the InMemoryClassRepository will
-		// generate a number of classes at random. In this case, we instruct it
-		// to generate 50 classes at once.
+		// Instantiate a new in-memory Class repository, generating 50 records.
 		cr := classRepos.NewInMemoryClassRepository(50)
 
     // Create a new message bus instance
@@ -37,29 +36,23 @@ var serveCmd = &cobra.Command{
 		// Create a new Gin router instance
 		e := gin.Default()
 
+    // Configure CORS, allowing all origins
     corsConf := cors.DefaultConfig()
     corsConf.AllowAllOrigins = true
     e.Use(cors.New(corsConf))
 
-		e.GET("/debug", func(ctx *gin.Context) {
-			// This handler will return arrays of all mocked data so that the
-			// developer can use it for testing.
-			//
-			// In a real-world deployment with a database configured, this
-			// endpoint would be removed as the developer would be able to just
-			// query the database locally.
-			ctx.JSON(200, gin.H{
-				"classes.items": cr.Items,
-			})
-		})
+    // Add request validation from codegen
+    swagger, _ := api.GetSwagger()
+    e.Use(middleware.OapiRequestValidator(swagger))
 
-		// Register routes
-		classEndpoints := e.Group("/classes")
-		{
-			classEndpoints.GET("/", classes.GetClasses(&cr))   // list all classes
-			classEndpoints.GET("/:id", classes.GetClass(&cr))  // get class by id
-			classEndpoints.POST("/", classes.CreateClass(&cr)) // create new class
-		}
+    // Create Service Interface for codegen-based endpoint configuration
+    si := handlers.OpenSchoolImpl{
+      Repository: &cr,
+      Bus: b,
+    }
+
+    // Register codegen handlers from implemented functions
+    e = api.RegisterHandlers(e, &si)
 
 		// Create an HTTP server instance using the Gin handler
 		s := server.Server{
