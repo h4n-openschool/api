@@ -14,6 +14,12 @@ commands:
           paths:
             - "/go/pkg/mod"
 
+  login-dockerhub:
+    steps:
+      - run:
+          name: Log in to Docker Hub
+          command: echo $DOCKERHUB_PASSWORD | docker login -u hbjy --password-stdin
+
 jobs:
   build:
     working_directory: ~/repo
@@ -37,13 +43,10 @@ jobs:
     working_directory: ~/repo
     docker:
       - image: cimg/go:1.19.3
-        auth:
-          username: hbjy
-          password: $DOCKERHUB_TOKEN
-    resource_class: small
     steps:
       - setup_remote_docker:
           docker_layer_caching: true  # default - false
+      - login-dockerhub
       - checkout
       - run:
           name: Build hbjy/openschool-api container image
