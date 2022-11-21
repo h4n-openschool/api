@@ -27,14 +27,14 @@
           pkgs = nixpkgsFor.${system};
         in
         {
-          classes = pkgs.buildGoModule {
-            pname = "classes";
+          api = pkgs.buildGoModule {
+            pname = "api";
             inherit version;
             src = ./.;
             vendorSha256 = null;
           };
         });
 
-      defaultPackage = forAllSystems (system: self.packages.${system}.classes);
+      defaultPackage = forAllSystems (system: self.packages.${system}.api);
     };
 }
