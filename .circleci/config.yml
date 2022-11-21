@@ -33,6 +33,31 @@ jobs:
           destination: api-linux-amd64
           name: API Binary
 
+  build-docker:
+    working_directory: ~/repo
+    docker:
+      - image: cimg/go:1.19.3
+        auth:
+          username: hbjy
+          password: $DOCKERHUB_TOKEN
+    resource_class: small
+    steps:
+      - setup_remote_docker:
+          docker_layer_caching: true  # default - false
+      - checkout
+      - run:
+          name: Build hbjy/openschool-api container image
+          command: |
+            docker build . \
+              -t hbjy/openschool-api:${CIRCLE_BRANCH} \
+              -t hbjy/openschool-api:${CIRCLE_SHA1}
+      - run:
+          name: Push hbjy/openschool-api container image
+          command: |
+            docker push \
+              hbjy/openschool-api:${CIRCLE_BRANCH} \
+              hbjy/openschool-api:${CIRCLE_SHA1}
+
   lint:
     working_directory: ~/repo
     docker:
@@ -56,6 +81,10 @@ jobs:
           path: /tmp/test-reports
 
 workflows:
+  docker-build:
+    jobs:
+      - build-docker
+
   lint-build:
     jobs:
       - lint
