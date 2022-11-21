@@ -119,3 +119,8 @@ func (i *OpenSchoolImpl) ClassesCreate(ctx *gin.Context) {
 
   ctx.JSON(http.StatusCreated, response)
 }
+
+func (i *OpenSchoolImpl) ClassesGet(ctx *gin.Content, id api.Cuid) {
+
+}
+

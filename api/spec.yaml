@@ -65,6 +65,42 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
 
+  /v1/classes/{id}:
+    get:
+      operationId: classesGet
+      summary: Get a clas by its CUID
+      tags: [classes, v1]
+      parameters:
+        - in: path
+          name: id
+          schema:
+            $ref: '#/components/schemas/Cuid'
+          required: true
+      responses:
+        '200':
+          description: The class found for the CUID provided.
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - class
+                properties:
+                  class:
+                    $ref: '#/components/schemas/Class'
+        404:
+          description: No class was found with that ID.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        500:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
 components:
   schemas:
     PaginationData:
