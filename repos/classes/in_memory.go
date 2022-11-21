@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/h4n-openschool/classes/models"
-	"github.com/h4n-openschool/classes/utils"
+	"github.com/h4n-openschool/api/models"
+	"github.com/h4n-openschool/api/utils"
 	"github.com/lucsky/cuid"
 )
 

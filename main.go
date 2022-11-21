@@ -7,7 +7,7 @@ package main
 // @tag.name classes
 // @tag.description Endpoints that expose class information.
 
-import "github.com/h4n-openschool/classes/cmd"
+import "github.com/h4n-openschool/api/cmd"
 
 func main() {
 	cmd.Execute()

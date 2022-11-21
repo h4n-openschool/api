@@ -2,7 +2,7 @@ package utils
 
 import (
 	"github.com/gin-gonic/gin"
-	"github.com/h4n-openschool/classes/api"
+	"github.com/h4n-openschool/api/api"
 )
 
 func ValidatorFunc(c *gin.Context, message string, code int) {

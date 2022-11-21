@@ -1,8 +1,8 @@
 package handlers
 
 import (
-	"github.com/h4n-openschool/classes/bus"
-	"github.com/h4n-openschool/classes/repos/classes"
+	"github.com/h4n-openschool/api/bus"
+	"github.com/h4n-openschool/api/repos/classes"
 )
 
 // OpenSchoolImpl implements the [api.ServerInterface] to implement the contract

@@ -4,12 +4,12 @@ import (
 	middleware "github.com/deepmap/oapi-codegen/pkg/gin-middleware"
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
-	"github.com/h4n-openschool/classes/api"
-	"github.com/h4n-openschool/classes/bus"
-	"github.com/h4n-openschool/classes/handlers"
-	classRepos "github.com/h4n-openschool/classes/repos/classes"
-	"github.com/h4n-openschool/classes/server"
-	"github.com/h4n-openschool/classes/utils"
+	"github.com/h4n-openschool/api/api"
+	"github.com/h4n-openschool/api/bus"
+	"github.com/h4n-openschool/api/handlers"
+	classRepos "github.com/h4n-openschool/api/repos/classes"
+	"github.com/h4n-openschool/api/server"
+	"github.com/h4n-openschool/api/utils"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )
@@ -72,10 +72,19 @@ var serveCmd = &cobra.Command{
 
 func init() {
 	rootCmd.AddCommand(serveCmd)
+  var err error
 
 	// Create a flag to hold the listen address for the server
 	serveCmd.Flags().String("addr", "0.0.0.0:http", "The address to open a TCP listener on.")
-  err := viper.BindPFlag("addr", serveCmd.Flags().Lookup("addr"))
+  err = viper.BindPFlag("addr", serveCmd.Flags().Lookup("addr"))
+  if err != nil {
+    panic(err)
+  }
+
+  // Create a flag to configure the AMQP connection string
+
+  serveCmd.Flags().String("amqp.dsn", "amqp://guest:guest@localhost:5672", "The DSN of the AMQP service to connect to for the event bus.")
+  err = viper.BindPFlag("amqp.dsn", serveCmd.Flags().Lookup("amqp.dsn"))
   if err != nil {
     panic(err)
   }

@@ -1,4 +1,4 @@
-module github.com/h4n-openschool/classes
+module github.com/h4n-openschool/api
 
 go 1.19
 

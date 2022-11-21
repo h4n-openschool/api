@@ -1,8 +1,8 @@
 package classes
 
 import (
-	"github.com/h4n-openschool/classes/models"
-	"github.com/h4n-openschool/classes/utils"
+	"github.com/h4n-openschool/api/models"
+	"github.com/h4n-openschool/api/utils"
 )
 
 // ClassRepository defines a common interface for querying Class data

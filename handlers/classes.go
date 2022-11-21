@@ -6,10 +6,10 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	"github.com/h4n-openschool/classes/api"
-	"github.com/h4n-openschool/classes/bus"
-	"github.com/h4n-openschool/classes/models"
-	"github.com/h4n-openschool/classes/utils"
+	"github.com/h4n-openschool/api/api"
+	"github.com/h4n-openschool/api/bus"
+	"github.com/h4n-openschool/api/models"
+	"github.com/h4n-openschool/api/utils"
 	"github.com/rabbitmq/amqp091-go"
   "github.com/gosimple/slug"
 )

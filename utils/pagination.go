@@ -5,7 +5,7 @@ import (
 	"log"
 
 	"github.com/gin-gonic/gin"
-	"github.com/h4n-openschool/classes/api"
+	"github.com/h4n-openschool/api/api"
 )
 
 const (

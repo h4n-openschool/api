@@ -3,7 +3,7 @@ package models
 import (
 	"time"
 
-	"github.com/h4n-openschool/classes/api"
+	"github.com/h4n-openschool/api/api"
 )
 
 // Class represents a class students can attend
