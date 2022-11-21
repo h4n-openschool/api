@@ -18,7 +18,7 @@ commands:
     steps:
       - run:
           name: Log in to Docker Hub
-          command: echo $DOCKERHUB_PASSWORD | docker login -u hbjy --password-stdin
+          command: docker login -u hbjy -p "$DOCKERHUB_PASSWORD"
 
 jobs:
   build:
