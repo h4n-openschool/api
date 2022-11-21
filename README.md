@@ -1,6 +1,9 @@
-# openschool/classes
+# OpenSchool API
 
-The Class microservice of OpenSchool.
+[![CircleCI](https://dl.circleci.com/status-badge/img/gh/h4n-openschool/api/tree/main.svg?style=svg)](https://dl.circleci.com/status-badge/redirect/gh/h4n-openschool/api/tree/main)
+
+The API service of OpenSchool, powering the UI and sending messages to/from the
+message bus.
 
 ## Development Prerequisites
 
