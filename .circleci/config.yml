@@ -4,7 +4,7 @@ jobs:
   build:
     working_directory: ~/repo
     docker:
-      - image: circleci/golang:1.19.3
+      - image: circleci/go:1.19.3
     steps:
       - checkout
       - run:
@@ -20,7 +20,7 @@ jobs:
   lint:
     working_directory: ~/repo
     docker:
-      - image: circleci/golang:1.19.3
+      - image: circleci/go:1.19.3
     steps:
       - run:
           name: Install golangci-lint
