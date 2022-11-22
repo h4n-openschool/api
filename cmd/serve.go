@@ -1,8 +1,6 @@
 package cmd
 
 import (
-	middleware "github.com/deepmap/oapi-codegen/pkg/gin-middleware"
-	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/h4n-openschool/api/api"
 	"github.com/h4n-openschool/api/bus"
@@ -37,23 +35,9 @@ var serveCmd = &cobra.Command{
       return err
     }
 
-		// Create a new Gin router instance
-		e := gin.Default()
-
-    // Configure CORS, allowing all origins
-    corsConf := cors.DefaultConfig()
-    corsConf.AllowAllOrigins = true
-    e.Use(cors.New(corsConf))
-
-    // Add error handling middleware to catch, log, and respond to errors.
-    e.Use(utils.ErrorHandler(logger))
-
-    // Add request validation from codegen
-    swagger, _ := api.GetSwagger()
-    opts := middleware.Options{
-      ErrorHandler: utils.ValidatorFunc,
-    }
-    e.Use(middleware.OapiRequestValidatorWithOptions(swagger, &opts))
+		// Create a new Gin router instance with the required middleware already
+    // bootstrapped.
+		e := utils.ApplyMiddleware(gin.Default(), logger)
 
     // Create Service Interface for codegen-based endpoint configuration
     si := handlers.OpenSchoolImpl{
