@@ -43,6 +43,7 @@ var serveCmd = &cobra.Command{
 		si := handlers.OpenSchoolImpl{
 			Repository: &cr,
 			Bus:        b,
+			Logger:     logger,
 		}
 
 		// Register codegen handlers from implemented functions
