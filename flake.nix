@@ -31,7 +31,8 @@
             pname = "api";
             inherit version;
             src = ./.;
-            vendorSha256 = null;
+            proxyVendor = true;
+            vendorSha256 = "sha256-HrGHG9uagPsiS0xHsm1ZVHDmAyrWkcxKZDIFeJxZ65o=";
           };
         });
 

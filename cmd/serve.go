@@ -12,6 +12,7 @@ import (
 	"github.com/h4n-openschool/api/utils"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
+	"go.uber.org/zap"
 )
 
 // serveCmd represents the serve command
@@ -22,6 +23,8 @@ var serveCmd = &cobra.Command{
 		// Read a configured address from the command line, environment variable
 		// or any detected config file.
 		addr := viper.GetString("addr")
+
+    logger, _ := zap.NewDevelopment()
 
 		// Instantiate a new in-memory Class repository, generating 50 records.
 		cr := classRepos.NewInMemoryClassRepository(50)
@@ -41,6 +44,9 @@ var serveCmd = &cobra.Command{
     corsConf := cors.DefaultConfig()
     corsConf.AllowAllOrigins = true
     e.Use(cors.New(corsConf))
+
+    // Add error handling middleware to catch, log, and respond to errors.
+    e.Use(utils.ErrorHandler(logger))
 
     // Add request validation from codegen
     swagger, _ := api.GetSwagger()
