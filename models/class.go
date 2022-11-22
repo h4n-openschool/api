@@ -38,11 +38,7 @@ func (c *Class) AsApiClass() api.Class {
   }
 }
 
-func (c *Class) ReconcileWithApiClass(name *string, description *string, displayName *string) *Class {
-  if name != nil {
-    c.Name = *name
-  }
-
+func (c *Class) ReconcileWithApiClass(description *string, displayName *string) *Class {
   if description != nil {
     c.Description = description
   }

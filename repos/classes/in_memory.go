@@ -10,10 +10,14 @@ import (
 	"github.com/lucsky/cuid"
 )
 
+var (
+	ClassDoesNotExist = errors.New("no existing class found by that id")
+)
+
 // InMemoryClassRepository implements the [ClassRepository] interface using an
 // in-memory slice of [models.Class] items.
 type InMemoryClassRepository struct {
-  // Items is the slice of [models.Class] items stored in memory.
+	// Items is the slice of [models.Class] items stored in memory.
 	Items []models.Class
 }
 
@@ -22,11 +26,11 @@ type InMemoryClassRepository struct {
 func NewInMemoryClassRepository(itemCount int) InMemoryClassRepository {
 	var items []models.Class
 
-  // Generate classes in-memory to use with repo methods.
+	// Generate classes in-memory to use with repo methods.
 	for i := 0; i < itemCount; i++ {
 		id := cuid.New()
 
-    desc := fmt.Sprintf(`This is class %v`, i)
+		desc := fmt.Sprintf(`This is class %v`, i)
 		items = append(items, models.Class{
 			Id:          id,
 			Name:        fmt.Sprintf(`class-%v`, i),
@@ -37,8 +41,8 @@ func NewInMemoryClassRepository(itemCount int) InMemoryClassRepository {
 		})
 	}
 
-  // Return the new repository to the caller
-  return InMemoryClassRepository{Items: items}
+	// Return the new repository to the caller
+	return InMemoryClassRepository{Items: items}
 }
 
 func (r *InMemoryClassRepository) GetAll(pq utils.PaginationQuery) ([]models.Class, error) {
@@ -68,22 +72,33 @@ func (r *InMemoryClassRepository) Get(id string) (*models.Class, error) {
 
 func (r *InMemoryClassRepository) Update(class *models.Class) (*models.Class, error) {
 	var found *models.Class
-	for _, v := range r.Items {
-		if v.Id == found.Id {
-			if class.Name != v.Name {
+
+	for k, v := range r.Items {
+		if v.Id == class.Id {
+			if class.Name != "" && class.Name != v.Name {
 				return nil, errors.New("you cannot update Name after creation")
 			}
 
-			v.DisplayName = class.DisplayName
-			v.Description = class.Description
+      if v.DisplayName != "" {
+        v.DisplayName = class.DisplayName
+      }
+
+      if v.Description != nil {
+        v.Description = class.Description
+      }
+
 			v.UpdatedAt = time.Now()
 
 			found = &v
+
+      r.Items[k] = *found
+
+      break
 		}
 	}
 
 	if found == nil {
-		return nil, errors.New("no existing class found by that id")
+		return nil, ClassDoesNotExist
 	}
 
 	return found, nil
@@ -119,6 +134,5 @@ func (r *InMemoryClassRepository) Delete(class models.Class) error {
 }
 
 func (r *InMemoryClassRepository) Count() (int, error) {
-  return len(r.Items), nil
+	return len(r.Items), nil
 }
-

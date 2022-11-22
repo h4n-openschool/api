@@ -3,6 +3,7 @@ package handlers
 import (
 	"encoding/json"
 	"errors"
+	"log"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -132,20 +133,12 @@ func (i *OpenSchoolImpl) ClassesUpdate(ctx *gin.Context, id api.Cuid) {
   var body api.ClassesUpdateJSONRequestBody
   _ = ctx.Bind(&body)
 
-  class, err := i.Repository.Get(id)
-	if err != nil {
-		_ = ctx.AbortWithError(http.StatusInternalServerError, err)
-		return
-	}
+  class := &models.Class{Id: id}
+  class = class.ReconcileWithApiClass(body.Description, body.DisplayName)
 
-	if class == nil {
-		_ = ctx.AbortWithError(http.StatusNotFound, errors.New("Class not found"))
-		return
-	}
+  log.Printf("%v", class.DisplayName)
 
-  class = class.ReconcileWithApiClass(body.Name, body.Description, body.DisplayName)
-
-  class, err = i.Repository.Update(class)
+  class, err := i.Repository.Update(class)
   if err != nil {
     _ = ctx.AbortWithError(http.StatusInternalServerError, err)
   }
