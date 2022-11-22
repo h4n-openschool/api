@@ -1,19 +1,9 @@
 version: 2.1
 
-commands:
-  install-deps:
-    steps:
-      - restore_cache:
-          keys:
-            - go-mod-v4-{{ checksum "go.sum" }}
-      - run:
-          name: Install Dependencies
-          command: go mod download
-      - save_cache:
-          key: go-mod-v4-{{ checksum "go.sum" }}
-          paths:
-            - "/go/pkg/mod"
+orbs:
+  go: circleci/go@1.7.1
 
+commands:
   login-dockerhub:
     steps:
       - run:
@@ -26,8 +16,7 @@ jobs:
     executor:
       name: go/default
       tag: '1.19.3'
-    orbs:
-      go: circleci/go@1.7.1
+    resource_class: small
     steps:
       - checkout
       - go/mod-download-cached
@@ -40,8 +29,7 @@ jobs:
     executor:
       name: go/default
       tag: '1.19.3'
-    orbs:
-      go: circleci/go@1.7.1
+    resource_class: small
     steps:
       - checkout
       - go/mod-download-cached
@@ -77,8 +65,6 @@ jobs:
           command: |
             docker push hbjy/openschool-api:${CIRCLE_BRANCH}
             docker push hbjy/openschool-api:${CIRCLE_SHA1}
-
-
 
 workflows:
   docker-build:
