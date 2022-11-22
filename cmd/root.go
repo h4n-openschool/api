@@ -46,7 +46,7 @@ func initConfig() {
 		// Use config file from the flag.
 		viper.SetConfigFile(cfgFile)
 	} else {
-		viper.SetEnvPrefix("os_classes")
+		viper.SetEnvPrefix("OSAPI")
 
 		viper.SetConfigType("yaml")
 		viper.SetConfigName("config")

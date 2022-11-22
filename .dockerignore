@@ -1,0 +1,10 @@
+.envrc
+.oapi-codegen.yaml
+api/spec.yaml
+.circleci/
+flake.nix
+flake.lock
+config.yaml
+LICENSE
+Makefile
+README.md

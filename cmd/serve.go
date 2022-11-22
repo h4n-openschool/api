@@ -22,7 +22,7 @@ var serveCmd = &cobra.Command{
 		// or any detected config file.
 		addr := viper.GetString("addr")
 
-		logger, _ := zap.NewDevelopment()
+		logger, _ := zap.NewProduction()
 
 		// Instantiate a new in-memory Class repository, generating 50 records.
 		cr := classRepos.NewInMemoryClassRepository(50)
@@ -37,7 +37,8 @@ var serveCmd = &cobra.Command{
 
 		// Create a new Gin router instance with the required middleware already
 		// bootstrapped.
-		e := utils.ApplyMiddleware(gin.Default(), logger)
+		gin.SetMode(gin.ReleaseMode)
+		e := utils.ApplyMiddleware(gin.New(), logger)
 
 		// Create Service Interface for codegen-based endpoint configuration
 		si := handlers.OpenSchoolImpl{
@@ -53,6 +54,7 @@ var serveCmd = &cobra.Command{
 		s := server.Server{
 			Addr:    addr,
 			Handler: e,
+			Logger:  logger,
 		}
 
 		// Have the server start serving Gin requests on the listen address

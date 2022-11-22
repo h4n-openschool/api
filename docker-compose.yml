@@ -8,3 +8,11 @@ services:
       - 15672:15672
       - 5672:5672
 
+  api:
+    image: hbjy/openschool-api:main
+    build:
+      context: .
+    command: serve --amqp.dsn=amqp://guest:guest@rabbitmq:5672/
+    ports:
+      - 8080:80
+

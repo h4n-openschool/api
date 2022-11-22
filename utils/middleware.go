@@ -1,8 +1,11 @@
 package utils
 
 import (
+	"time"
+
 	middleware "github.com/deepmap/oapi-codegen/pkg/gin-middleware"
 	"github.com/gin-contrib/cors"
+	ginzap "github.com/gin-contrib/zap"
 	"github.com/gin-gonic/gin"
 	"github.com/h4n-openschool/api/api"
 	"go.uber.org/zap"
@@ -14,6 +17,10 @@ func ApplyMiddleware(e *gin.Engine, logger *zap.Logger) *gin.Engine {
 
 	// Add error handling middleware to catch, log, and respond to errors.
 	e.Use(ErrorHandler(logger))
+
+  // Configure logging and recovery through Zap logger
+  e.Use(ginzap.Ginzap(logger, time.RFC3339, true))
+  e.Use(ginzap.RecoveryWithZap(logger, true))
 
 	return e
 }
