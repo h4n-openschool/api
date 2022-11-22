@@ -26,6 +26,8 @@ jobs:
     executor:
       name: go/default
       tag: '1.19.3'
+    orbs:
+      go: circleci/go@1.7.1
     resource_class: small
     steps:
       - checkout
@@ -39,6 +41,8 @@ jobs:
     executor:
       name: go/default
       tag: '1.19.3'
+    orbs:
+      go: circleci/go@1.7.1
     resource_class: small
     steps:
       - checkout
