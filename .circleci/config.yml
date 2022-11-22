@@ -23,21 +23,36 @@ commands:
 jobs:
   build:
     working_directory: ~/repo
-    docker:
-      - image: cimg/go:1.19.3
+    executor:
+      name: go/default
+      tag: '1.19.3'
     resource_class: small
     steps:
       - checkout
-      - install-deps
+      - go/mod-download-cached
       - run:
           name: Build CLI
+          command: go build -o /tmp/api
+
+  lint:
+    working_directory: ~/repo
+    executor:
+      name: go/default
+      tag: '1.19.3'
+    resource_class: small
+    steps:
+      - checkout
+      - go/mod-download-cached
+      - run:
+          name: Install golangci-lint
+          command: go install github.com/golangci/golangci-lint/cmd/golangci-lint
+      - run:
+          name: Run golangci-lint
           command: |
-            mkdir -p out
-            go build -o out/api .
-      - store_artifacts:
-          path: out/api
-          destination: api-linux-amd64
-          name: API Binary
+            mkdir /tmp/test-reports
+            golangci-lint run --out-format=junit-xml > /tmp/test-reports/junit.xml
+      - store_test_results:
+          path: /tmp/test-reports
 
   build-docker:
     working_directory: ~/repo
@@ -61,27 +76,7 @@ jobs:
             docker push hbjy/openschool-api:${CIRCLE_BRANCH}
             docker push hbjy/openschool-api:${CIRCLE_SHA1}
 
-  lint:
-    working_directory: ~/repo
-    docker:
-      - image: cimg/go:1.19.3
-    resource_class: small
-    steps:
-      - checkout
-      - install-deps
-      - run:
-          name: Install golangci-lint
-          command: |
-            go install github.com/golangci/golangci-lint/cmd/golangci-lint
-      - run:
-          name: Run golangci-lint
-          command: |
-            mkdir -p /tmp/test-reports \
-            && golangci-lint run \
-              --out-format=junit-xml > \
-              /tmp/test-reports/junit.xml
-      - store_test_results:
-          path: /tmp/test-reports
+
 
 workflows:
   docker-build:
