@@ -3,7 +3,6 @@ package handlers
 import (
 	"encoding/json"
 	"errors"
-	"log"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -11,6 +10,7 @@ import (
 	"github.com/h4n-openschool/api/api"
 	"github.com/h4n-openschool/api/bus"
 	"github.com/h4n-openschool/api/models"
+	"github.com/h4n-openschool/api/repos/classes"
 	"github.com/h4n-openschool/api/utils"
 	"github.com/rabbitmq/amqp091-go"
 )
@@ -136,12 +136,25 @@ func (i *OpenSchoolImpl) ClassesUpdate(ctx *gin.Context, id api.Cuid) {
   class := &models.Class{Id: id}
   class = class.ReconcileWithApiClass(body.Description, body.DisplayName)
 
-  log.Printf("%v", class.DisplayName)
-
   class, err := i.Repository.Update(class)
   if err != nil {
     _ = ctx.AbortWithError(http.StatusInternalServerError, err)
   }
 
   ctx.JSON(http.StatusOK, api.ClassesUpdateResponse{Class: class.AsApiClass()})
+}
+
+func (i *OpenSchoolImpl) ClassesDelete(ctx *gin.Context, id api.Cuid) {
+  class := models.Class{Id: id}
+
+  err := i.Repository.Delete(class)
+  if err != nil {
+    if err == classes.ClassDoesNotExist {
+      _ = ctx.AbortWithError(http.StatusNotFound, err)
+    } else {
+      _ = ctx.AbortWithError(http.StatusInternalServerError, err)
+    }
+  }
+
+  ctx.JSON(http.StatusOK, gin.H{"ok": true})
 }

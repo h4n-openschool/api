@@ -122,6 +122,17 @@ func (r *InMemoryClassRepository) Create(class models.Class) (*models.Class, err
 func (r *InMemoryClassRepository) Delete(class models.Class) error {
 	var newItems []models.Class
 
+  var found *models.Class
+  for _, c := range r.Items {
+    if c.Id == class.Id {
+      found = &c
+      break
+    }
+  }
+  if found == nil {
+    return ClassDoesNotExist
+  }
+
 	for _, c := range r.Items {
 		if c.Id != class.Id {
 			newItems = append(newItems, c)
