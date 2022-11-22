@@ -49,6 +49,7 @@ func (i *OpenSchoolImpl) ClassesList(ctx *gin.Context, params api.ClassesListPar
 	ctx.JSON(http.StatusOK, response)
 }
 
+// ClassesCreate implements the classesCreate contract from the OpenAPI spec.
 func (i *OpenSchoolImpl) ClassesCreate(ctx *gin.Context) {
 	var body api.ClassesCreateRequest
 	if err := ctx.BindJSON(&body); err != nil {
@@ -111,6 +112,7 @@ func (i *OpenSchoolImpl) ClassesCreate(ctx *gin.Context) {
 	ctx.JSON(http.StatusCreated, response)
 }
 
+// ClassesGet implements the classesGet contract from the OpenAPI spec.
 func (i *OpenSchoolImpl) ClassesGet(ctx *gin.Context, id api.Cuid) {
 	class, err := i.Repository.Get(id)
 	if err != nil {
