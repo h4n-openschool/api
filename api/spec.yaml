@@ -68,7 +68,7 @@ paths:
   /v1/classes/{id}:
     get:
       operationId: classesGet
-      summary: Get a clas by its CUID
+      summary: Get a class by its CUID
       tags: [classes, v1]
       parameters:
         - in: path
@@ -88,6 +88,48 @@ paths:
                 properties:
                   class:
                     $ref: '#/components/schemas/Class'
+        404:
+          description: No class was found with that ID.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        500:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+    patch:
+      operationId: classesUpdate
+      summary: Update a class by its CUID
+      tags: [classes, v1]
+      parameters:
+        - in: path
+          name: id
+          schema:
+            $ref: '#/components/schemas/Cuid'
+          required: true
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ClassesUpdateRequest'
+      responses:
+        '200':
+          description: The class found for the CUID provided.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ClassesUpdateResponse'
+        400:
+          description: There was a problem with your input.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
         404:
           description: No class was found with that ID.
           content:
@@ -213,6 +255,30 @@ components:
           example: Basic maths class
 
     ClassesCreateResponse:
+      type: object
+      required:
+        - class
+      properties:
+        class:
+          $ref: '#/components/schemas/Class'
+
+    ClassesUpdateRequest:
+      type: object
+      properties:
+        name:
+          type: string
+          description: The name of the Class
+          example: mathsOneOhOne
+        displayName:
+          type: string
+          description: The display name of the Class
+          example: Maths 101
+        description:
+          type: string
+          description: The description of the Class
+          example: Basic maths class
+
+    ClassesUpdateResponse:
       type: object
       required:
         - class

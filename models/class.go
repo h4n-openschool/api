@@ -38,6 +38,22 @@ func (c *Class) AsApiClass() api.Class {
   }
 }
 
+func (c *Class) ReconcileWithApiClass(name *string, description *string, displayName *string) *Class {
+  if name != nil {
+    c.Name = *name
+  }
+
+  if description != nil {
+    c.Description = description
+  }
+
+  if displayName != nil {
+    c.DisplayName = *displayName
+  }
+
+  return c
+}
+
 func ClassesAsApiClassList(classes []Class) (api.ClassList) {
   classList := api.ClassList{}
   for _, class := range classes { 

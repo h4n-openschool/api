@@ -127,3 +127,28 @@ func (i *OpenSchoolImpl) ClassesGet(ctx *gin.Context, id api.Cuid) {
 
 	ctx.JSON(http.StatusOK, gin.H{"class": class.AsApiClass()})
 }
+
+func (i *OpenSchoolImpl) ClassesUpdate(ctx *gin.Context, id api.Cuid) {
+  var body api.ClassesUpdateJSONRequestBody
+  _ = ctx.Bind(&body)
+
+  class, err := i.Repository.Get(id)
+	if err != nil {
+		_ = ctx.AbortWithError(http.StatusInternalServerError, err)
+		return
+	}
+
+	if class == nil {
+		_ = ctx.AbortWithError(http.StatusNotFound, errors.New("Class not found"))
+		return
+	}
+
+  class = class.ReconcileWithApiClass(body.Name, body.Description, body.DisplayName)
+
+  class, err = i.Repository.Update(class)
+  if err != nil {
+    _ = ctx.AbortWithError(http.StatusInternalServerError, err)
+  }
+
+  ctx.JSON(http.StatusOK, api.ClassesUpdateResponse{Class: class.AsApiClass()})
+}
