@@ -10,18 +10,23 @@ import (
 	"github.com/lucsky/cuid"
 )
 
+// InMemoryClassRepository implements the [ClassRepository] interface using an
+// in-memory slice of [models.Class] items.
 type InMemoryClassRepository struct {
+  // Items is the slice of [models.Class] items stored in memory.
 	Items []models.Class
 }
 
+// NewInMemoryClassRepository creates a new instance of
+// [NewInMemoryClassRepository]
 func NewInMemoryClassRepository(itemCount int) InMemoryClassRepository {
 	var items []models.Class
 
+  // Generate classes in-memory to use with repo methods.
 	for i := 0; i < itemCount; i++ {
 		id := cuid.New()
 
     desc := fmt.Sprintf(`This is class %v`, i)
-
 		items = append(items, models.Class{
 			Id:          id,
 			Name:        fmt.Sprintf(`class-%v`, i),
@@ -32,6 +37,7 @@ func NewInMemoryClassRepository(itemCount int) InMemoryClassRepository {
 		})
 	}
 
+  // Return the new repository to the caller
   return InMemoryClassRepository{Items: items}
 }
 
