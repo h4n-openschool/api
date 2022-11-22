@@ -2,6 +2,7 @@ version: 2.1
 
 orbs:
   go: circleci/go@1.7.1
+  tools-orb: signavio/tools-orb@0.9.0
 
 commands:
   login-dockerhub:
@@ -33,9 +34,7 @@ jobs:
     steps:
       - checkout
       - go/mod-download-cached
-      - run:
-          name: Install golangci-lint
-          command: go install github.com/golangci/golangci-lint/cmd/golangci-lint
+      - tools-orb/install-golangci-lint
       - run:
           name: Run golangci-lint
           command: |
