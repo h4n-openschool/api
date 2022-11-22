@@ -22,31 +22,31 @@ var serveCmd = &cobra.Command{
 		// or any detected config file.
 		addr := viper.GetString("addr")
 
-    logger, _ := zap.NewDevelopment()
+		logger, _ := zap.NewDevelopment()
 
 		// Instantiate a new in-memory Class repository, generating 50 records.
 		cr := classRepos.NewInMemoryClassRepository(50)
 
-    // Create a new message bus instance
-    b := bus.GetOrCreateBus()
+		// Create a new message bus instance
+		b := bus.GetOrCreateBus()
 
-    // Try to connect to the message bus or fail on error
-    if err := b.Connect(); err != nil {
-      return err
-    }
+		// Try to connect to the message bus or fail on error
+		if err := b.Connect(); err != nil {
+			return err
+		}
 
 		// Create a new Gin router instance with the required middleware already
-    // bootstrapped.
+		// bootstrapped.
 		e := utils.ApplyMiddleware(gin.Default(), logger)
 
-    // Create Service Interface for codegen-based endpoint configuration
-    si := handlers.OpenSchoolImpl{
-      Repository: &cr,
-      Bus: b,
-    }
+		// Create Service Interface for codegen-based endpoint configuration
+		si := handlers.OpenSchoolImpl{
+			Repository: &cr,
+			Bus:        b,
+		}
 
-    // Register codegen handlers from implemented functions
-    e = api.RegisterHandlers(e, &si)
+		// Register codegen handlers from implemented functions
+		e = api.RegisterHandlers(e, &si)
 
 		// Create an HTTP server instance using the Gin handler
 		s := server.Server{
@@ -62,20 +62,20 @@ var serveCmd = &cobra.Command{
 
 func init() {
 	rootCmd.AddCommand(serveCmd)
-  var err error
+	var err error
 
 	// Create a flag to hold the listen address for the server
 	serveCmd.Flags().String("addr", "0.0.0.0:http", "The address to open a TCP listener on.")
-  err = viper.BindPFlag("addr", serveCmd.Flags().Lookup("addr"))
-  if err != nil {
-    panic(err)
-  }
+	err = viper.BindPFlag("addr", serveCmd.Flags().Lookup("addr"))
+	if err != nil {
+		panic(err)
+	}
 
-  // Create a flag to configure the AMQP connection string
+	// Create a flag to configure the AMQP connection string
 
-  serveCmd.Flags().String("amqp.dsn", "amqp://guest:guest@localhost:5672", "The DSN of the AMQP service to connect to for the event bus.")
-  err = viper.BindPFlag("amqp.dsn", serveCmd.Flags().Lookup("amqp.dsn"))
-  if err != nil {
-    panic(err)
-  }
+	serveCmd.Flags().String("amqp.dsn", "amqp://guest:guest@localhost:5672", "The DSN of the AMQP service to connect to for the event bus.")
+	err = viper.BindPFlag("amqp.dsn", serveCmd.Flags().Lookup("amqp.dsn"))
+	if err != nil {
+		panic(err)
+	}
 }
