@@ -2,7 +2,7 @@ version: 2.1
 
 orbs:
   go: circleci/go@1.7.1
-  tools-orb: signavio/tools-orb@0.9.0
+  golangci: ory/golangci@0.0.19
 
 commands:
   login-dockerhub:
@@ -33,15 +33,8 @@ jobs:
     resource_class: small
     steps:
       - checkout
-      - go/mod-download-cached
-      - tools-orb/install-golangci-lint
-      - run:
-          name: Run golangci-lint
-          command: |
-            mkdir /tmp/test-reports
-            golangci-lint run --out-format=junit-xml > /tmp/test-reports/junit.xml
-      - store_test_results:
-          path: /tmp/test-reports
+      - golangci/install
+      - golangci/lint
 
   build-docker:
     working_directory: ~/repo
