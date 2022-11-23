@@ -8,7 +8,7 @@ import (
 
 // Class represents a class students can attend
 type Class struct {
-  BaseMetadata
+	BaseMetadata
 
 	// Name is the computer-friendly name of the class
 	Name string `json:"name"`
@@ -21,33 +21,32 @@ type Class struct {
 }
 
 func (c *Class) AsApiClass() api.Class {
-  return api.Class{
-    Id: c.Id,
-    Name: c.Name,
-    DisplayName: c.DisplayName,
-    Description: *c.Description,
-    CreatedAt: c.CreatedAt.Format(time.RFC3339),
-    UpdatedAt: c.UpdatedAt.Format(time.RFC3339),
-  }
+	return api.Class{
+		Id:          c.Id,
+		Name:        c.Name,
+		DisplayName: c.DisplayName,
+		Description: *c.Description,
+		CreatedAt:   c.CreatedAt.Format(time.RFC3339),
+		UpdatedAt:   c.UpdatedAt.Format(time.RFC3339),
+	}
 }
 
 func (c *Class) ReconcileWithApiClass(description *string, displayName *string) *Class {
-  if description != nil {
-    c.Description = description
-  }
+	if description != nil {
+		c.Description = description
+	}
 
-  if displayName != nil {
-    c.DisplayName = *displayName
-  }
+	if displayName != nil {
+		c.DisplayName = *displayName
+	}
 
-  return c
+	return c
 }
 
-func ClassesAsApiClassList(classes []Class) (api.ClassList) {
-  classList := api.ClassList{}
-  for _, class := range classes { 
-    classList = append(classList, class.AsApiClass())
-  }
-  return classList
+func ClassesAsApiClassList(classes []Class) api.ClassList {
+	classList := api.ClassList{}
+	for _, class := range classes {
+		classList = append(classList, class.AsApiClass())
+	}
+	return classList
 }
-

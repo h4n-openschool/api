@@ -27,6 +27,6 @@ type TeacherRepository interface {
 	// relevant record for it in the data store.
 	Delete(teacher models.Teacher) error
 
-  // Count returns the total number of teachers in the datastore.
-  Count() (int, error)
+	// Count returns the total number of teachers in the datastore.
+	Count() (int, error)
 }

@@ -18,9 +18,9 @@ func ApplyMiddleware(e *gin.Engine, logger *zap.Logger) *gin.Engine {
 	// Add error handling middleware to catch, log, and respond to errors.
 	e.Use(ErrorHandler(logger))
 
-  // Configure logging and recovery through Zap logger
-  e.Use(ginzap.Ginzap(logger, time.RFC3339, true))
-  e.Use(ginzap.RecoveryWithZap(logger, true))
+	// Configure logging and recovery through Zap logger
+	e.Use(ginzap.Ginzap(logger, time.RFC3339, true))
+	e.Use(ginzap.RecoveryWithZap(logger, true))
 
 	return e
 }

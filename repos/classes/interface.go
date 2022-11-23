@@ -27,6 +27,6 @@ type ClassRepository interface {
 	// relevant record for it in the data store.
 	Delete(class models.Class) error
 
-  // Count returns the total number of classes in the datastore.
-  Count() (int, error)
+	// Count returns the total number of classes in the datastore.
+	Count() (int, error)
 }
