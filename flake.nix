@@ -32,7 +32,7 @@
             inherit version;
             src = ./.;
             proxyVendor = true;
-            vendorSha256 = "sha256-/vxP7hSd4Lq3thzBilAd9Zb/QGHP2nWmxYr2j2e2vJE=";
+            vendorSha256 = "sha256-VtVWsKD4mri82FacL0ulvlzOxWEKw22+Gj1mYKY3H9k=";
           };
         });
 
