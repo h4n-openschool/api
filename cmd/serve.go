@@ -6,6 +6,7 @@ import (
 	"github.com/h4n-openschool/api/bus"
 	"github.com/h4n-openschool/api/handlers"
 	classRepos "github.com/h4n-openschool/api/repos/classes"
+	teacherRepos "github.com/h4n-openschool/api/repos/teachers"
 	"github.com/h4n-openschool/api/server"
 	"github.com/h4n-openschool/api/utils"
 	"github.com/spf13/cobra"
@@ -23,6 +24,9 @@ var serveCmd = &cobra.Command{
 		addr := viper.GetString("addr")
 
 		logger, _ := zap.NewProduction()
+
+		// Instantiate a new in-memory Teacher repository, generating 50 records.
+		tr := teacherRepos.NewInMemoryTeacherRepository(4)
 
 		// Instantiate a new in-memory Class repository, generating 50 records.
 		cr := classRepos.NewInMemoryClassRepository(50)
@@ -42,9 +46,10 @@ var serveCmd = &cobra.Command{
 
 		// Create Service Interface for codegen-based endpoint configuration
 		si := handlers.OpenSchoolImpl{
-			Repository: &cr,
-			Bus:        b,
-			Logger:     logger,
+			ClassRepository:   &cr,
+			TeacherRepository: &tr,
+			Bus:               b,
+			Logger:            logger,
 		}
 
 		// Register codegen handlers from implemented functions

@@ -13,12 +13,22 @@ func ErrorHandler(logger *zap.Logger) gin.HandlerFunc {
 		c.Next()
 
 		for _, err := range c.Errors {
-			e := api.Error{
-				Code:    c.Writer.Status(),
-				Message: err.Error(),
+			status := -1
+			message := err.Error()
+
+			logger.Info(message)
+
+			if err.Error() == "no matching operation was found" {
+				status = 404
+				message = "Route not found."
 			}
 
-			c.JSON(-1, e)
+			e := api.Error{
+				Code:    status,
+				Message: message,
+			}
+
+			c.JSON(status, e)
 		}
 	}
 }

@@ -8,8 +8,7 @@ import (
 
 // Class represents a class students can attend
 type Class struct {
-	// Id is the cuid of the class
-	Id string `json:"id"`
+  BaseMetadata
 
 	// Name is the computer-friendly name of the class
 	Name string `json:"name"`
@@ -19,12 +18,6 @@ type Class struct {
 
 	// Description is the human-readable description of what the class teaches.
 	Description *string `json:"description"`
-
-	// CreatedAt is the time at which this class was created.
-	CreatedAt time.Time `json:"created_at"`
-
-	// UpdatedAt is the time at which this class was updated.
-	UpdatedAt time.Time `json:"updated_at"`
 }
 
 func (c *Class) AsApiClass() api.Class {

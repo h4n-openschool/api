@@ -6,24 +6,23 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	"github.com/gosimple/slug"
 	"github.com/h4n-openschool/api/api"
 	"github.com/h4n-openschool/api/bus"
 	"github.com/h4n-openschool/api/models"
-	"github.com/h4n-openschool/api/repos/classes"
+	"github.com/h4n-openschool/api/repos/teachers"
 	"github.com/h4n-openschool/api/utils"
 	"github.com/rabbitmq/amqp091-go"
 )
 
-// ClassesList implements the classesList operation from the OpenAPI
+// Teachers implements the teachersList operation from the OpenAPI
 // specification in [../api/spec.yaml].
-func (i *OpenSchoolImpl) ClassesList(ctx *gin.Context, params api.ClassesListParams) {
+func (i *OpenSchoolImpl) TeachersList(ctx *gin.Context, params api.TeachersListParams) {
 	// Read pagination options from the ClassesListParams object
 	pagination := utils.NewPaginationQuery()
 	pagination.ReadFromOptional(params.Page, params.PerPage)
 
 	// Retrieve a paginated list of classes
-	classes, err := i.ClassRepository.GetAll(pagination)
+	classes, err := i.TeacherRepository.GetAll(pagination)
 	if err != nil {
 		_ = ctx.AbortWithError(http.StatusInternalServerError, err)
 	}
@@ -35,14 +34,14 @@ func (i *OpenSchoolImpl) ClassesList(ctx *gin.Context, params api.ClassesListPar
 	}
 
 	// Generate pagination data from the total and input pagination options.
-	paginationData := utils.GeneratePaginationData("/v1/classes", total, pagination)
+	paginationData := utils.GeneratePaginationData("/v1/teachers", total, pagination)
 
 	// Convert the class model array to an api.ClassList type to meet the OpenAPI definition.
-	classList := models.ClassesAsApiClassList(classes)
+	teachersList := models.TeachersAsApiTeacherList(classes)
 
 	// Build the response body as a ClassesListResponse type.
-	response := api.ClassesListResponse{
-		Classes:    classList,
+	response := api.TeachersListResponse{
+		Teachers:   teachersList,
 		Pagination: paginationData,
 	}
 
@@ -50,25 +49,14 @@ func (i *OpenSchoolImpl) ClassesList(ctx *gin.Context, params api.ClassesListPar
 	ctx.JSON(http.StatusOK, response)
 }
 
-// ClassesCreate implements the classesCreate contract from the OpenAPI spec.
-func (i *OpenSchoolImpl) ClassesCreate(ctx *gin.Context) {
-	var body api.ClassesCreateRequest
-	if err := ctx.BindJSON(&body); err != nil {
-		_ = ctx.AbortWithError(400, err)
-	}
+// TeachersCreate implements the teachersCreate contract from the OpenAPI spec.
+func (i *OpenSchoolImpl) TeachersCreate(ctx *gin.Context) {
+	var body api.TeachersCreateJSONRequestBody
+	_ = ctx.Bind(&body)
 
-	in := models.Class{
-		DisplayName: body.DisplayName,
-	}
-
-	if body.Name != nil {
-		in.Name = *body.Name
-	} else {
-		in.Name = slug.Make(body.DisplayName)
-	}
-
-	if body.Description != nil {
-		in.Description = body.Description
+	in := models.Teacher{
+		FullName: body.FullName,
+		Email:    body.Email,
 	}
 
 	c, q, err := i.Bus.ChannelQueue()
@@ -76,16 +64,16 @@ func (i *OpenSchoolImpl) ClassesCreate(ctx *gin.Context) {
 		_ = ctx.AbortWithError(http.StatusInternalServerError, err)
 	}
 
-	class, err := i.ClassRepository.Create(in)
+	teacher, err := i.TeacherRepository.Create(in)
 	if err != nil {
 		_ = ctx.AbortWithError(http.StatusInternalServerError, err)
 	}
 
-	ev := bus.Event[*models.Class]{
-		Data: class,
+	ev := bus.Event[*models.Teacher]{
+		Data: teacher,
 		Metadata: bus.EventMeta{
 			Type:     "create",
-			Resource: "class",
+			Resource: "teacher",
 		},
 	}
 
@@ -106,52 +94,55 @@ func (i *OpenSchoolImpl) ClassesCreate(ctx *gin.Context) {
 		_ = ctx.AbortWithError(http.StatusInternalServerError, err)
 	}
 
-	response := api.ClassesCreateResponse{
-		Class: class.AsApiClass(),
+	response := api.TeachersCreateResponse{
+		Teacher: teacher.AsApiTeacher(),
 	}
 
 	ctx.JSON(http.StatusCreated, response)
 }
 
-// ClassesGet implements the classesGet contract from the OpenAPI spec.
-func (i *OpenSchoolImpl) ClassesGet(ctx *gin.Context, id api.Cuid) {
-	class, err := i.ClassRepository.Get(id)
+// TeachersGet implements the teachersGet contract from the OpenAPI spec.
+func (i *OpenSchoolImpl) TeachersGet(ctx *gin.Context, id api.Cuid) {
+	teacher, err := i.TeacherRepository.Get(id)
 	if err != nil {
 		_ = ctx.AbortWithError(http.StatusInternalServerError, err)
 		return
 	}
 
-	if class == nil {
-		_ = ctx.AbortWithError(http.StatusNotFound, errors.New("Class not found"))
+	if teacher == nil {
+		_ = ctx.AbortWithError(http.StatusNotFound, errors.New("Teacher not found"))
 		return
 	}
 
-	ctx.JSON(http.StatusOK, gin.H{"class": class.AsApiClass()})
+	ctx.JSON(http.StatusOK, gin.H{"teacher": teacher.AsApiTeacher()})
 }
 
-func (i *OpenSchoolImpl) ClassesUpdate(ctx *gin.Context, id api.Cuid) {
-	var body api.ClassesUpdateJSONRequestBody
+// TeachersUpdate implements the teachersUpdate contract from the OpenAPI spec.
+func (i *OpenSchoolImpl) TeachersUpdate(ctx *gin.Context, id api.Cuid) {
+	var body api.TeachersUpdateJSONRequestBody
 	_ = ctx.Bind(&body)
 
-	class := &models.Class{}
-	class.Id = id
-	class = class.ReconcileWithApiClass(body.Description, body.DisplayName)
+	teacher := &models.Teacher{}
+	teacher.Id = id
+	teacher.FullName = body.FullName
+	teacher.Email = body.Email
 
-	class, err := i.ClassRepository.Update(class)
+	teacher, err := i.TeacherRepository.Update(teacher)
 	if err != nil {
 		_ = ctx.AbortWithError(http.StatusInternalServerError, err)
 	}
 
-	ctx.JSON(http.StatusOK, api.ClassesUpdateResponse{Class: class.AsApiClass()})
+	ctx.JSON(http.StatusOK, api.TeachersUpdateResponse{Teacher: teacher.AsApiTeacher()})
 }
 
-func (i *OpenSchoolImpl) ClassesDelete(ctx *gin.Context, id api.Cuid) {
-	class := models.Class{}
-	class.Id = id
+// TeachersDelete implements the teachersDelete contract from the OpenAPI spec.
+func (i *OpenSchoolImpl) TeachersDelete(ctx *gin.Context, id api.Cuid) {
+	teacher := models.Teacher{}
+	teacher.Id = id
 
-	err := i.ClassRepository.Delete(class)
+	err := i.TeacherRepository.Delete(teacher)
 	if err != nil {
-		if err == classes.ClassDoesNotExist {
+		if err == teachers.TeacherDoesNotExist {
 			_ = ctx.AbortWithError(http.StatusNotFound, err)
 		} else {
 			_ = ctx.AbortWithError(http.StatusInternalServerError, err)

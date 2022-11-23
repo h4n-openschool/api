@@ -32,12 +32,14 @@ func NewInMemoryClassRepository(itemCount int) InMemoryClassRepository {
 
 		desc := fmt.Sprintf(`This is class %v`, i)
 		items = append(items, models.Class{
-			Id:          id,
+			BaseMetadata: models.BaseMetadata{
+				Id:        id,
+				CreatedAt: time.Now(),
+				UpdatedAt: time.Now(),
+			},
 			Name:        fmt.Sprintf(`class-%v`, i),
 			DisplayName: fmt.Sprintf(`Class %v`, i),
 			Description: &desc,
-			CreatedAt:   time.Now(),
-			UpdatedAt:   time.Now(),
 		})
 	}
 
@@ -79,21 +81,21 @@ func (r *InMemoryClassRepository) Update(class *models.Class) (*models.Class, er
 				return nil, errors.New("you cannot update Name after creation")
 			}
 
-      if v.DisplayName != "" {
-        v.DisplayName = class.DisplayName
-      }
+			if v.DisplayName != "" {
+				v.DisplayName = class.DisplayName
+			}
 
-      if v.Description != nil {
-        v.Description = class.Description
-      }
+			if v.Description != nil {
+				v.Description = class.Description
+			}
 
 			v.UpdatedAt = time.Now()
 
 			found = &v
 
-      r.Items[k] = *found
+			r.Items[k] = *found
 
-      break
+			break
 		}
 	}
 
@@ -106,12 +108,14 @@ func (r *InMemoryClassRepository) Update(class *models.Class) (*models.Class, er
 
 func (r *InMemoryClassRepository) Create(class models.Class) (*models.Class, error) {
 	model := models.Class{
-		Id:          cuid.New(),
+		BaseMetadata: models.BaseMetadata{
+			Id:        cuid.New(),
+			CreatedAt: time.Now(),
+			UpdatedAt: time.Now(),
+		},
 		Name:        class.Name,
 		DisplayName: class.DisplayName,
 		Description: class.Description,
-		CreatedAt:   time.Now(),
-		UpdatedAt:   time.Now(),
 	}
 
 	r.Items = append(r.Items, model)
@@ -122,16 +126,16 @@ func (r *InMemoryClassRepository) Create(class models.Class) (*models.Class, err
 func (r *InMemoryClassRepository) Delete(class models.Class) error {
 	var newItems []models.Class
 
-  var found *models.Class
-  for _, c := range r.Items {
-    if c.Id == class.Id {
-      found = &c
-      break
-    }
-  }
-  if found == nil {
-    return ClassDoesNotExist
-  }
+	var found *models.Class
+	for _, c := range r.Items {
+		if c.Id == class.Id {
+			found = &c
+			break
+		}
+	}
+	if found == nil {
+		return ClassDoesNotExist
+	}
 
 	for _, c := range r.Items {
 		if c.Id != class.Id {

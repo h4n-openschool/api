@@ -103,8 +103,64 @@ type PaginationData struct {
 	Total    int    `json:"total"`
 }
 
+// Teacher defines model for Teacher.
+type Teacher struct {
+	// CreatedAt An RFC3339 date/time string
+	CreatedAt DateTime `json:"createdAt"`
+	Email     string   `json:"email"`
+	FullName  string   `json:"fullName"`
+
+	// Id A cuid
+	Id Cuid `json:"id"`
+
+	// UpdatedAt An RFC3339 date/time string
+	UpdatedAt DateTime `json:"updatedAt"`
+}
+
+// TeacherList An array of Teachers
+type TeacherList = []Teacher
+
+// TeachersCreateRequest defines model for TeachersCreateRequest.
+type TeachersCreateRequest struct {
+	Email    string `json:"email"`
+	FullName string `json:"fullName"`
+}
+
+// TeachersCreateResponse defines model for TeachersCreateResponse.
+type TeachersCreateResponse struct {
+	Teacher Teacher `json:"teacher"`
+}
+
+// TeachersListResponse The response for the /v1/teachers endpoint
+type TeachersListResponse struct {
+	Pagination PaginationData `json:"pagination"`
+
+	// Teachers An array of Teachers
+	Teachers TeacherList `json:"teachers"`
+}
+
+// TeachersUpdateRequest defines model for TeachersUpdateRequest.
+type TeachersUpdateRequest struct {
+	Email    string `json:"email"`
+	FullName string `json:"fullName"`
+}
+
+// TeachersUpdateResponse defines model for TeachersUpdateResponse.
+type TeachersUpdateResponse struct {
+	Teacher Teacher `json:"teacher"`
+}
+
 // ClassesListParams defines parameters for ClassesList.
 type ClassesListParams struct {
+	// PerPage The number of results to retrieve in each page.
+	PerPage *int `form:"perPage,omitempty" json:"perPage,omitempty"`
+
+	// Page The page to load.
+	Page *int `form:"page,omitempty" json:"page,omitempty"`
+}
+
+// TeachersListParams defines parameters for TeachersList.
+type TeachersListParams struct {
 	// PerPage The number of results to retrieve in each page.
 	PerPage *int `form:"perPage,omitempty" json:"perPage,omitempty"`
 
@@ -117,6 +173,12 @@ type ClassesCreateJSONRequestBody = ClassesCreateRequest
 
 // ClassesUpdateJSONRequestBody defines body for ClassesUpdate for application/json ContentType.
 type ClassesUpdateJSONRequestBody = ClassesUpdateRequest
+
+// TeachersCreateJSONRequestBody defines body for TeachersCreate for application/json ContentType.
+type TeachersCreateJSONRequestBody = TeachersCreateRequest
+
+// TeachersUpdateJSONRequestBody defines body for TeachersUpdate for application/json ContentType.
+type TeachersUpdateJSONRequestBody = TeachersUpdateRequest
 
 // ServerInterface represents all server handlers.
 type ServerInterface interface {
@@ -135,6 +197,21 @@ type ServerInterface interface {
 	// Update a class by its CUID
 	// (PATCH /v1/classes/{id})
 	ClassesUpdate(c *gin.Context, id Cuid)
+	// List all teachers
+	// (GET /v1/teachers)
+	TeachersList(c *gin.Context, params TeachersListParams)
+	// Create a new teacher
+	// (POST /v1/teachers)
+	TeachersCreate(c *gin.Context)
+	// Delete a teacher by its CUID
+	// (DELETE /v1/teachers/{id})
+	TeachersDelete(c *gin.Context, id Cuid)
+	// Get a teacher by its CUID
+	// (GET /v1/teachers/{id})
+	TeachersGet(c *gin.Context, id Cuid)
+	// Update a teacher by its CUID
+	// (PATCH /v1/teachers/{id})
+	TeachersUpdate(c *gin.Context, id Cuid)
 }
 
 // ServerInterfaceWrapper converts contexts to parameters.
@@ -250,6 +327,110 @@ func (siw *ServerInterfaceWrapper) ClassesUpdate(c *gin.Context) {
 	siw.Handler.ClassesUpdate(c, id)
 }
 
+// TeachersList operation middleware
+func (siw *ServerInterfaceWrapper) TeachersList(c *gin.Context) {
+
+	var err error
+
+	// Parameter object where we will unmarshal all parameters from the context
+	var params TeachersListParams
+
+	// ------------- Optional query parameter "perPage" -------------
+
+	err = runtime.BindQueryParameter("form", true, false, "perPage", c.Request.URL.Query(), &params.PerPage)
+	if err != nil {
+		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter perPage: %s", err), http.StatusBadRequest)
+		return
+	}
+
+	// ------------- Optional query parameter "page" -------------
+
+	err = runtime.BindQueryParameter("form", true, false, "page", c.Request.URL.Query(), &params.Page)
+	if err != nil {
+		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter page: %s", err), http.StatusBadRequest)
+		return
+	}
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		middleware(c)
+	}
+
+	siw.Handler.TeachersList(c, params)
+}
+
+// TeachersCreate operation middleware
+func (siw *ServerInterfaceWrapper) TeachersCreate(c *gin.Context) {
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		middleware(c)
+	}
+
+	siw.Handler.TeachersCreate(c)
+}
+
+// TeachersDelete operation middleware
+func (siw *ServerInterfaceWrapper) TeachersDelete(c *gin.Context) {
+
+	var err error
+
+	// ------------- Path parameter "id" -------------
+	var id Cuid
+
+	err = runtime.BindStyledParameter("simple", false, "id", c.Param("id"), &id)
+	if err != nil {
+		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter id: %s", err), http.StatusBadRequest)
+		return
+	}
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		middleware(c)
+	}
+
+	siw.Handler.TeachersDelete(c, id)
+}
+
+// TeachersGet operation middleware
+func (siw *ServerInterfaceWrapper) TeachersGet(c *gin.Context) {
+
+	var err error
+
+	// ------------- Path parameter "id" -------------
+	var id Cuid
+
+	err = runtime.BindStyledParameter("simple", false, "id", c.Param("id"), &id)
+	if err != nil {
+		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter id: %s", err), http.StatusBadRequest)
+		return
+	}
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		middleware(c)
+	}
+
+	siw.Handler.TeachersGet(c, id)
+}
+
+// TeachersUpdate operation middleware
+func (siw *ServerInterfaceWrapper) TeachersUpdate(c *gin.Context) {
+
+	var err error
+
+	// ------------- Path parameter "id" -------------
+	var id Cuid
+
+	err = runtime.BindStyledParameter("simple", false, "id", c.Param("id"), &id)
+	if err != nil {
+		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter id: %s", err), http.StatusBadRequest)
+		return
+	}
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		middleware(c)
+	}
+
+	siw.Handler.TeachersUpdate(c, id)
+}
+
 // GinServerOptions provides options for the Gin server.
 type GinServerOptions struct {
 	BaseURL      string
@@ -289,33 +470,48 @@ func RegisterHandlersWithOptions(router *gin.Engine, si ServerInterface, options
 
 	router.PATCH(options.BaseURL+"/v1/classes/:id", wrapper.ClassesUpdate)
 
+	router.GET(options.BaseURL+"/v1/teachers", wrapper.TeachersList)
+
+	router.POST(options.BaseURL+"/v1/teachers", wrapper.TeachersCreate)
+
+	router.DELETE(options.BaseURL+"/v1/teachers/:id", wrapper.TeachersDelete)
+
+	router.GET(options.BaseURL+"/v1/teachers/:id", wrapper.TeachersGet)
+
+	router.PATCH(options.BaseURL+"/v1/teachers/:id", wrapper.TeachersUpdate)
+
 	return router
 }
 
 // Base64 encoded, gzipped, json marshaled Swagger object
 var swaggerSpec = []string{
 
-	"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",
+	"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",
 }
 
 // GetSwagger returns the content of the embedded swagger specification file

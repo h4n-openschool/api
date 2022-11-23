@@ -179,6 +179,180 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
 
+  /v1/teachers:
+    get:
+      operationId: teachersList
+      summary: List all teachers
+      tags: [teachers, v1]
+      parameters:
+        - in: query
+          name: perPage
+          schema:
+            type: integer
+          description: The number of results to retrieve in each page.
+        - in: query
+          name: page
+          schema:
+            type: integer
+          description: The page to load.
+      responses:
+        '200':
+          description: A list of classes and pagination details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TeachersListResponse'
+        500:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+    post:
+      operationId: teachersCreate
+      summary: Create a new teacher
+      tags: [teachers, v1]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TeachersCreateRequest'
+      responses:
+        '201':
+          description: The created teacher, populated with metadata.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TeachersCreateResponse'
+        '400':
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        500:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /v1/teachers/{id}:
+    get:
+      operationId: teachersGet
+      summary: Get a teacher by its CUID
+      tags: [teachers, v1]
+      parameters:
+        - in: path
+          name: id
+          schema:
+            $ref: '#/components/schemas/Cuid'
+          required: true
+      responses:
+        '200':
+          description: The teacher found for the CUID provided.
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - class
+                properties:
+                  teacher:
+                    $ref: '#/components/schemas/Teacher'
+        404:
+          description: No teacher was found with that ID.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        500:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+    patch:
+      operationId: teachersUpdate
+      summary: Update a teacher by its CUID
+      tags: [teachers, v1]
+      parameters:
+        - in: path
+          name: id
+          schema:
+            $ref: '#/components/schemas/Cuid'
+          required: true
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TeachersUpdateRequest'
+      responses:
+        '200':
+          description: The teacher found for the CUID provided.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TeachersUpdateResponse'
+        400:
+          description: There was a problem with your input.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        404:
+          description: No teacher was found with that ID.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        500:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+    delete:
+      operationId: teachersDelete
+      summary: Delete a teacher by its CUID
+      tags: [teachers, v1]
+      parameters:
+        - in: path
+          name: id
+          schema:
+            $ref: '#/components/schemas/Cuid'
+          required: true
+      responses:
+        '200':
+          description: The teacher found for the CUID provided.
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - ok
+                properties:
+                  ok:
+                    type: boolean
+                    example: true
+        404:
+          description: No teacher was found with that ID.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        500:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
 components:
   schemas:
     PaginationData:
@@ -321,6 +495,88 @@ components:
       properties:
         class:
           $ref: '#/components/schemas/Class'
+
+    Teacher:
+      type: object
+      required:
+        - id
+        - fullName
+        - email
+        - createdAt
+        - updatedAt
+      properties:
+        id:
+          $ref: '#/components/schemas/Cuid'
+        fullName:
+          type: string
+          example: John Doe
+        email:
+          type: string
+          example: john.doe@myschool.edu
+        createdAt:
+          $ref: '#/components/schemas/DateTime'
+        updatedAt:
+          $ref: '#/components/schemas/DateTime'
+
+    TeacherList:
+      description: An array of Teachers
+      type: array
+      items:
+        $ref: '#/components/schemas/Teacher'
+
+    TeachersListResponse:
+      description: The response for the /v1/teachers endpoint
+      type: object
+      required:
+        - pagination
+        - teachers
+      properties:
+        pagination:
+          $ref: '#/components/schemas/PaginationData'
+        teachers:
+          $ref: '#/components/schemas/TeacherList'
+
+    TeachersCreateRequest:
+      type: object
+      required:
+        - fullName
+        - email
+      properties:
+        fullName:
+          type: string
+          example: John Doe
+        email:
+          type: string
+          example: john.doe@myschool.edu
+
+    TeachersCreateResponse:
+      type: object
+      required:
+        - teacher
+      properties:
+        teacher:
+          $ref: '#/components/schemas/Teacher'
+
+    TeachersUpdateRequest:
+      type: object
+      required:
+        - fullName
+        - email
+      properties:
+        fullName:
+          type: string
+          example: John Doe
+        email:
+          type: string
+          example: john.doe@school.edu
+
+    TeachersUpdateResponse:
+      type: object
+      required:
+        - teacher
+      properties:
+        teacher:
+          $ref: '#/components/schemas/Teacher'
 
     Error:
       type: object

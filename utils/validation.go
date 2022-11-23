@@ -6,11 +6,14 @@ import (
 )
 
 func ValidatorFunc(c *gin.Context, message string, code int) {
-  valErr := api.Error{
-    Code: 400,
-    Message: message,
-  }
+	if message == "no matching operation was found" {
+		code = 404
+	}
 
-  c.AbortWithStatusJSON(400, valErr)
+	valErr := api.Error{
+		Code:    code,
+		Message: message,
+	}
+
+	c.AbortWithStatusJSON(400, valErr)
 }
-
