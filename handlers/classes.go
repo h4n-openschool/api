@@ -8,6 +8,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/gosimple/slug"
 	"github.com/h4n-openschool/api/api"
+	"github.com/h4n-openschool/api/auth"
 	"github.com/h4n-openschool/api/bus"
 	"github.com/h4n-openschool/api/models"
 	"github.com/h4n-openschool/api/repos/classes"
@@ -18,6 +19,10 @@ import (
 // ClassesList implements the classesList operation from the OpenAPI
 // specification in [../api/spec.yaml].
 func (i *OpenSchoolImpl) ClassesList(ctx *gin.Context, params api.ClassesListParams) {
+  if ok := auth.MustAuthenticate(ctx, i.TeacherRepository); ok {
+    return
+  }
+
 	// Read pagination options from the ClassesListParams object
 	pagination := utils.NewPaginationQuery()
 	pagination.ReadFromOptional(params.Page, params.PerPage)

@@ -14,6 +14,9 @@ type TeacherRepository interface {
 	// Get returns a single teacher by its ID.
 	Get(id string) (*models.Teacher, error)
 
+	// Get returns a single teacher by its email.
+	GetByEmail(email string) (*models.Teacher, error)
+
 	// Update takes a teacher object that has been mutated and persists it to the
 	// data store, returning the modified object and possibly an error.
 	Update(teacher *models.Teacher) (*models.Teacher, error)

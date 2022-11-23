@@ -22,6 +22,9 @@ func ApplyMiddleware(e *gin.Engine, logger *zap.Logger) *gin.Engine {
 	e.Use(ginzap.Ginzap(logger, time.RFC3339, true))
 	e.Use(ginzap.RecoveryWithZap(logger, true))
 
+  // Configure authentication middleware (no authorization done here)
+  e.Use(AuthenticateMiddleware)
+
 	return e
 }
 

@@ -7,8 +7,9 @@ import (
 )
 
 type Teacher struct {
-	FullName string `json:"fullName"`
-	Email    string `json:"email"`
+	FullName     string `json:"fullName"`
+	Email        string `json:"email"`
+	PasswordHash string `json:"-"`
 	BaseMetadata
 }
 

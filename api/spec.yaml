@@ -5,6 +5,37 @@ info:
   description: Interact with your childrens' teachers and their classes.
 
 paths:
+  /v1/auth/login:
+    post:
+      operationId: authLogin
+      summary: Generate a JWT to use as a bearer token for authentication.
+      tags: [auth, v1]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AuthLoginRequest'
+      responses:
+        200:
+          description: A JWT to be used for authentication.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthLoginResponse'
+        400:
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        500:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
   /v1/classes:
     get:
       operationId: classesList
@@ -401,6 +432,25 @@ components:
       type: string
       description: An RFC3339 date/time string
       example: '1985-04-12T23:20:50.52Z'
+
+    AuthLoginRequest:
+      type: object
+      required:
+        - email
+        - password
+      properties:
+        email:
+          type: string
+        password:
+          type: string
+
+    AuthLoginResponse:
+      type: object
+      required:
+        - token
+      properties:
+        token:
+          type: string
 
     Class:
       type: object

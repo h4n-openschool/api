@@ -8,6 +8,9 @@ require (
 	github.com/gin-contrib/cors v1.4.0
 	github.com/gin-contrib/zap v0.1.0
 	github.com/gin-gonic/gin v1.8.1
+	github.com/go-faker/faker/v4 v4.0.0-beta.3
+	github.com/golang-jwt/jwt v3.2.2+incompatible
+	github.com/golang-jwt/jwt/v4 v4.4.2
 	github.com/golangci/golangci-lint v1.50.1
 	github.com/gosimple/slug v1.13.1
 	github.com/lucsky/cuid v1.2.1
@@ -16,6 +19,7 @@ require (
 	github.com/spf13/cobra-cli v1.3.0
 	github.com/spf13/viper v1.14.0
 	go.uber.org/zap v1.23.0
+	golang.org/x/crypto v0.1.0
 )
 
 require (
@@ -194,7 +198,6 @@ require (
 	go.opentelemetry.io/otel/trace v1.10.0 // indirect
 	go.uber.org/atomic v1.9.0 // indirect
 	go.uber.org/multierr v1.8.0 // indirect
-	golang.org/x/crypto v0.1.0 // indirect
 	golang.org/x/exp v0.0.0-20220722155223-a9213eeb770e // indirect
 	golang.org/x/exp/typeparams v0.0.0-20220827204233-334a2380cb91 // indirect
 	golang.org/x/mod v0.6.0 // indirect

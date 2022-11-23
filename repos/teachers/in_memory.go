@@ -2,11 +2,14 @@ package teachers
 
 import (
 	"errors"
+	"fmt"
 	"time"
 
+	"github.com/go-faker/faker/v4"
 	"github.com/h4n-openschool/api/models"
 	"github.com/h4n-openschool/api/utils"
 	"github.com/lucsky/cuid"
+	"golang.org/x/crypto/bcrypt"
 )
 
 var (
@@ -25,6 +28,11 @@ type InMemoryTeacherRepository struct {
 func NewInMemoryTeacherRepository(itemCount int) InMemoryTeacherRepository {
 	var items []models.Teacher
 
+	password, err := bcrypt.GenerateFromPassword([]byte("password"), 10)
+	if err != nil {
+		panic(err)
+	}
+
 	// Generate classes in-memory to use with repo methods.
 	for i := 0; i < itemCount; i++ {
 		id := cuid.New()
@@ -35,8 +43,9 @@ func NewInMemoryTeacherRepository(itemCount int) InMemoryTeacherRepository {
 				CreatedAt: time.Now(),
 				UpdatedAt: time.Now(),
 			},
-			FullName: "John Doe",
-			Email:    "john.doe@school.edu",
+			FullName:     fmt.Sprintf("%v %v", faker.FirstName(), faker.LastName()),
+			Email:        faker.Email(),
+			PasswordHash: string(password),
 		})
 	}
 
@@ -64,6 +73,19 @@ func (r *InMemoryTeacherRepository) Get(id string) (*models.Teacher, error) {
 
 	for _, v := range r.Items {
 		if v.Id == id {
+			found = &v
+			break
+		}
+	}
+
+	return found, nil
+}
+
+func (r *InMemoryTeacherRepository) GetByEmail(email string) (*models.Teacher, error) {
+	var found *models.Teacher
+
+	for _, v := range r.Items {
+		if v.Email == email {
 			found = &v
 			break
 		}
