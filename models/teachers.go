@@ -7,9 +7,9 @@ import (
 )
 
 type Teacher struct {
-	BaseMetadata
 	FullName string `json:"fullName"`
 	Email    string `json:"email"`
+	BaseMetadata
 }
 
 func (c *Teacher) AsApiTeacher() api.Teacher {
