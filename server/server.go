@@ -62,7 +62,7 @@ func (s *Server) Listen() error {
 }
 
 func (s *Server) handleConnection(c net.Conn) {
-	defer c.Close()
+  defer c.Close()
 	reader := bufio.NewReader(c)
 
 	r, err := http.ReadRequest(reader)

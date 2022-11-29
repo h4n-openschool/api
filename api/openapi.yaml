@@ -1,15 +1,47 @@
-openapi: '3.0.0'
+openapi: '3.1.0'
 info:
   version: '1.0.0'
   title: 'OpenSchool API'
   description: Interact with your childrens' teachers and their classes.
 
+servers:
+  - url: http://localhost:8080
+
+security:
+  - bearerAuth: []
+
 paths:
+  /v1/auth/me:
+    get:
+      operationId: authCurrentUser
+      summary: Use a JWT to get the currently-authenticated user.
+      tags: [auth]
+      responses:
+        200:
+          description: A JWT to be used for authentication.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Teacher'
+        401:
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        500:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
   /v1/auth/login:
     post:
       operationId: authLogin
       summary: Generate a JWT to use as a bearer token for authentication.
-      tags: [auth, v1]
+      tags: [auth]
+      security: []
       requestBody:
         required: true
         content:
@@ -40,7 +72,7 @@ paths:
     get:
       operationId: classesList
       summary: List all classes
-      tags: [classes, v1]
+      tags: [classes]
       parameters:
         - in: query
           name: perPage
@@ -69,7 +101,7 @@ paths:
     post:
       operationId: classesCreate
       summary: Create a new class
-      tags: [classes, v1]
+      tags: [classes]
       requestBody:
         required: true
         content:
@@ -100,7 +132,7 @@ paths:
     get:
       operationId: classesGet
       summary: Get a class by its CUID
-      tags: [classes, v1]
+      tags: [classes]
       parameters:
         - in: path
           name: id
@@ -135,7 +167,7 @@ paths:
     patch:
       operationId: classesUpdate
       summary: Update a class by its CUID
-      tags: [classes, v1]
+      tags: [classes]
       parameters:
         - in: path
           name: id
@@ -177,7 +209,7 @@ paths:
     delete:
       operationId: classesDelete
       summary: Delete a class by its CUID
-      tags: [classes, v1]
+      tags: [classes]
       parameters:
         - in: path
           name: id
@@ -214,7 +246,7 @@ paths:
     get:
       operationId: teachersList
       summary: List all teachers
-      tags: [teachers, v1]
+      tags: [teachers]
       parameters:
         - in: query
           name: perPage
@@ -243,7 +275,7 @@ paths:
     post:
       operationId: teachersCreate
       summary: Create a new teacher
-      tags: [teachers, v1]
+      tags: [teachers]
       requestBody:
         required: true
         content:
@@ -274,7 +306,7 @@ paths:
     get:
       operationId: teachersGet
       summary: Get a teacher by its CUID
-      tags: [teachers, v1]
+      tags: [teachers]
       parameters:
         - in: path
           name: id
@@ -309,7 +341,7 @@ paths:
     patch:
       operationId: teachersUpdate
       summary: Update a teacher by its CUID
-      tags: [teachers, v1]
+      tags: [teachers]
       parameters:
         - in: path
           name: id
@@ -351,7 +383,7 @@ paths:
     delete:
       operationId: teachersDelete
       summary: Delete a teacher by its CUID
-      tags: [teachers, v1]
+      tags: [teachers]
       parameters:
         - in: path
           name: id
@@ -385,6 +417,12 @@ paths:
                 $ref: '#/components/schemas/Error'
 
 components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
   schemas:
     PaginationData:
       type: object

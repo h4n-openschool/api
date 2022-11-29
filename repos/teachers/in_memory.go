@@ -49,6 +49,17 @@ func NewInMemoryTeacherRepository(itemCount int) InMemoryTeacherRepository {
 		})
 	}
 
+  items = append(items, models.Teacher{
+    BaseMetadata: models.BaseMetadata{
+      Id: cuid.New(),
+      CreatedAt: time.Now(),
+      UpdatedAt: time.Now(),
+    },
+    FullName: "John Doe",
+    Email: "john.doe@school.edu",
+    PasswordHash: string(password),
+  })
+
 	// Return the new repository to the caller
 	return InMemoryTeacherRepository{Items: items}
 }

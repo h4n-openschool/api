@@ -4,6 +4,7 @@ import (
 	"time"
 
 	middleware "github.com/deepmap/oapi-codegen/pkg/gin-middleware"
+	"github.com/getkin/kin-openapi/openapi3filter"
 	"github.com/gin-contrib/cors"
 	ginzap "github.com/gin-contrib/zap"
 	"github.com/gin-gonic/gin"
@@ -46,7 +47,7 @@ func applyValidationMiddleware(e *gin.Engine) *gin.Engine {
 	opts := middleware.Options{
 		ErrorHandler: ValidatorFunc,
 	}
-
+  opts.Options.AuthenticationFunc = openapi3filter.NoopAuthenticationFunc
 	e.Use(middleware.OapiRequestValidatorWithOptions(swagger, &opts))
 	return e
 }

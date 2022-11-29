@@ -9,7 +9,6 @@ require (
 	github.com/gin-contrib/zap v0.1.0
 	github.com/gin-gonic/gin v1.8.1
 	github.com/go-faker/faker/v4 v4.0.0-beta.3
-	github.com/golang-jwt/jwt v3.2.2+incompatible
 	github.com/golang-jwt/jwt/v4 v4.4.2
 	github.com/golangci/golangci-lint v1.50.1
 	github.com/gosimple/slug v1.13.1

@@ -18,6 +18,10 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+const (
+	BearerAuthScopes = "bearerAuth.Scopes"
+)
+
 // AuthLoginRequest defines model for AuthLoginRequest.
 type AuthLoginRequest struct {
 	Email    string `json:"email"`
@@ -199,6 +203,9 @@ type ServerInterface interface {
 	// Generate a JWT to use as a bearer token for authentication.
 	// (POST /v1/auth/login)
 	AuthLogin(c *gin.Context)
+	// Use a JWT to get the currently-authenticated user.
+	// (GET /v1/auth/me)
+	AuthCurrentUser(c *gin.Context)
 	// List all classes
 	// (GET /v1/classes)
 	ClassesList(c *gin.Context, params ClassesListParams)
@@ -250,10 +257,24 @@ func (siw *ServerInterfaceWrapper) AuthLogin(c *gin.Context) {
 	siw.Handler.AuthLogin(c)
 }
 
+// AuthCurrentUser operation middleware
+func (siw *ServerInterfaceWrapper) AuthCurrentUser(c *gin.Context) {
+
+	c.Set(BearerAuthScopes, []string{""})
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		middleware(c)
+	}
+
+	siw.Handler.AuthCurrentUser(c)
+}
+
 // ClassesList operation middleware
 func (siw *ServerInterfaceWrapper) ClassesList(c *gin.Context) {
 
 	var err error
+
+	c.Set(BearerAuthScopes, []string{""})
 
 	// Parameter object where we will unmarshal all parameters from the context
 	var params ClassesListParams
@@ -284,6 +305,8 @@ func (siw *ServerInterfaceWrapper) ClassesList(c *gin.Context) {
 // ClassesCreate operation middleware
 func (siw *ServerInterfaceWrapper) ClassesCreate(c *gin.Context) {
 
+	c.Set(BearerAuthScopes, []string{""})
+
 	for _, middleware := range siw.HandlerMiddlewares {
 		middleware(c)
 	}
@@ -304,6 +327,8 @@ func (siw *ServerInterfaceWrapper) ClassesDelete(c *gin.Context) {
 		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter id: %s", err), http.StatusBadRequest)
 		return
 	}
+
+	c.Set(BearerAuthScopes, []string{""})
 
 	for _, middleware := range siw.HandlerMiddlewares {
 		middleware(c)
@@ -326,6 +351,8 @@ func (siw *ServerInterfaceWrapper) ClassesGet(c *gin.Context) {
 		return
 	}
 
+	c.Set(BearerAuthScopes, []string{""})
+
 	for _, middleware := range siw.HandlerMiddlewares {
 		middleware(c)
 	}
@@ -347,6 +374,8 @@ func (siw *ServerInterfaceWrapper) ClassesUpdate(c *gin.Context) {
 		return
 	}
 
+	c.Set(BearerAuthScopes, []string{""})
+
 	for _, middleware := range siw.HandlerMiddlewares {
 		middleware(c)
 	}
@@ -358,6 +387,8 @@ func (siw *ServerInterfaceWrapper) ClassesUpdate(c *gin.Context) {
 func (siw *ServerInterfaceWrapper) TeachersList(c *gin.Context) {
 
 	var err error
+
+	c.Set(BearerAuthScopes, []string{""})
 
 	// Parameter object where we will unmarshal all parameters from the context
 	var params TeachersListParams
@@ -388,6 +419,8 @@ func (siw *ServerInterfaceWrapper) TeachersList(c *gin.Context) {
 // TeachersCreate operation middleware
 func (siw *ServerInterfaceWrapper) TeachersCreate(c *gin.Context) {
 
+	c.Set(BearerAuthScopes, []string{""})
+
 	for _, middleware := range siw.HandlerMiddlewares {
 		middleware(c)
 	}
@@ -408,6 +441,8 @@ func (siw *ServerInterfaceWrapper) TeachersDelete(c *gin.Context) {
 		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter id: %s", err), http.StatusBadRequest)
 		return
 	}
+
+	c.Set(BearerAuthScopes, []string{""})
 
 	for _, middleware := range siw.HandlerMiddlewares {
 		middleware(c)
@@ -430,6 +465,8 @@ func (siw *ServerInterfaceWrapper) TeachersGet(c *gin.Context) {
 		return
 	}
 
+	c.Set(BearerAuthScopes, []string{""})
+
 	for _, middleware := range siw.HandlerMiddlewares {
 		middleware(c)
 	}
@@ -450,6 +487,8 @@ func (siw *ServerInterfaceWrapper) TeachersUpdate(c *gin.Context) {
 		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter id: %s", err), http.StatusBadRequest)
 		return
 	}
+
+	c.Set(BearerAuthScopes, []string{""})
 
 	for _, middleware := range siw.HandlerMiddlewares {
 		middleware(c)
@@ -489,6 +528,8 @@ func RegisterHandlersWithOptions(router *gin.Engine, si ServerInterface, options
 
 	router.POST(options.BaseURL+"/v1/auth/login", wrapper.AuthLogin)
 
+	router.GET(options.BaseURL+"/v1/auth/me", wrapper.AuthCurrentUser)
+
 	router.GET(options.BaseURL+"/v1/classes", wrapper.ClassesList)
 
 	router.POST(options.BaseURL+"/v1/classes", wrapper.ClassesCreate)
@@ -515,34 +556,36 @@ func RegisterHandlersWithOptions(router *gin.Engine, si ServerInterface, options
 // Base64 encoded, gzipped, json marshaled Swagger object
 var swaggerSpec = []string{
 
-	"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",
+	"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",
 }
 
 // GetSwagger returns the content of the embedded swagger specification file
