@@ -51,7 +51,7 @@ func NewInMemoryTeacherRepository(itemCount int) InMemoryTeacherRepository {
 
   items = append(items, models.Teacher{
     BaseMetadata: models.BaseMetadata{
-      Id: cuid.New(),
+      Id: "clb3x2ugq0004txk80dyoemxa",
       CreatedAt: time.Now(),
       UpdatedAt: time.Now(),
     },

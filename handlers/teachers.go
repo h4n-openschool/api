@@ -1,17 +1,14 @@
 package handlers
 
 import (
-	"encoding/json"
 	"errors"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
 	"github.com/h4n-openschool/api/api"
-	"github.com/h4n-openschool/api/bus"
 	"github.com/h4n-openschool/api/models"
 	"github.com/h4n-openschool/api/repos/teachers"
 	"github.com/h4n-openschool/api/utils"
-	"github.com/rabbitmq/amqp091-go"
 )
 
 // Teachers implements the teachersList operation from the OpenAPI
@@ -59,37 +56,7 @@ func (i *OpenSchoolImpl) TeachersCreate(ctx *gin.Context) {
 		Email:    body.Email,
 	}
 
-	c, q, err := i.Bus.ChannelQueue()
-	if err != nil {
-		_ = ctx.AbortWithError(http.StatusInternalServerError, err)
-	}
-
 	teacher, err := i.TeacherRepository.Create(in)
-	if err != nil {
-		_ = ctx.AbortWithError(http.StatusInternalServerError, err)
-	}
-
-	ev := bus.Event[*models.Teacher]{
-		Data: teacher,
-		Metadata: bus.EventMeta{
-			Type:     "create",
-			Resource: "teacher",
-		},
-	}
-
-	j, _ := json.Marshal(ev)
-
-	err = c.PublishWithContext(
-		ctx.Request.Context(),
-		"",
-		q.Name,
-		false,
-		false,
-		amqp091.Publishing{
-			ContentType: "application/json",
-			Body:        j,
-		},
-	)
 	if err != nil {
 		_ = ctx.AbortWithError(http.StatusInternalServerError, err)
 	}

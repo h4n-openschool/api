@@ -6,6 +6,7 @@ import (
 	"github.com/h4n-openschool/api/bus"
 	"github.com/h4n-openschool/api/handlers"
 	classRepos "github.com/h4n-openschool/api/repos/classes"
+	studentRepos "github.com/h4n-openschool/api/repos/students"
 	teacherRepos "github.com/h4n-openschool/api/repos/teachers"
 	"github.com/h4n-openschool/api/server"
 	"github.com/h4n-openschool/api/utils"
@@ -23,21 +24,16 @@ var serveCmd = &cobra.Command{
 		// or any detected config file.
 		addr := viper.GetString("addr")
 
-		logger, _ := zap.NewProduction()
+		logger, _ := zap.NewDevelopment()
 
 		// Instantiate a new in-memory Teacher repository, generating 50 records.
-		tr := teacherRepos.NewInMemoryTeacherRepository(4)
+		tr := teacherRepos.NewInMemoryTeacherRepository(10)
 
 		// Instantiate a new in-memory Class repository, generating 50 records.
-		cr := classRepos.NewInMemoryClassRepository(50)
+		cr := classRepos.NewInMemoryClassRepository(10)
 
-		// Create a new message bus instance
-		b := bus.GetOrCreateBus()
-
-		// Try to connect to the message bus or fail on error
-		if err := b.Connect(); err != nil {
-			return err
-		}
+		// Instantiate a new in-memory Student repository, generating 250 records.
+		sr := studentRepos.NewInMemoryStudentRepository(4 * 30)
 
 		// Create a new Gin router instance with the required middleware already
 		// bootstrapped.
@@ -48,7 +44,7 @@ var serveCmd = &cobra.Command{
 		si := handlers.OpenSchoolImpl{
 			ClassRepository:   &cr,
 			TeacherRepository: &tr,
-			Bus:               b,
+			StudentRepository: &sr,
 			Logger:            logger,
 		}
 

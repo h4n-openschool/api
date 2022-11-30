@@ -12,7 +12,7 @@ func MustAuthenticate(c *gin.Context, tr teachers.TeacherRepository) bool {
 
 	tId := c.GetString("auth.userId")
 	if tId == "" {
-		_ = c.AbortWithError(401, errors.New("you are unauthenticated"))
+		_ = c.AbortWithError(401, errors.New("you are unauthenticated (ma1)"))
 		return true
 	}
 
@@ -20,12 +20,12 @@ func MustAuthenticate(c *gin.Context, tr teachers.TeacherRepository) bool {
 	if err != nil {
 		e := c.Error(err)
 		_ = e.SetType(gin.ErrorTypePrivate)
-		_ = c.AbortWithError(401, errors.New("you are unauthenticated"))
+		_ = c.AbortWithError(401, errors.New("you are unauthenticated (ma2)"))
 		return true
 	}
 
 	if t == nil {
-		_ = c.AbortWithError(401, errors.New("you are unauthenticated"))
+		_ = c.AbortWithError(401, errors.New("you are unauthenticated (ma3)"))
 		return true
 	}
 

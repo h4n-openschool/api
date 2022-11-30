@@ -1,4 +1,4 @@
-openapi: '3.1.0'
+openapi: '3.0.0'
 info:
   version: '1.0.0'
   title: 'OpenSchool API'
@@ -73,6 +73,8 @@ paths:
       operationId: classesList
       summary: List all classes
       tags: [classes]
+      security:
+        - bearerAuth: []
       parameters:
         - in: query
           name: perPage
@@ -102,6 +104,8 @@ paths:
       operationId: classesCreate
       summary: Create a new class
       tags: [classes]
+      security:
+        - bearerAuth: []
       requestBody:
         required: true
         content:
@@ -133,6 +137,8 @@ paths:
       operationId: classesGet
       summary: Get a class by its CUID
       tags: [classes]
+      security:
+        - bearerAuth: []
       parameters:
         - in: path
           name: id
@@ -168,6 +174,8 @@ paths:
       operationId: classesUpdate
       summary: Update a class by its CUID
       tags: [classes]
+      security:
+        - bearerAuth: []
       parameters:
         - in: path
           name: id
@@ -210,6 +218,8 @@ paths:
       operationId: classesDelete
       summary: Delete a class by its CUID
       tags: [classes]
+      security:
+        - bearerAuth: []
       parameters:
         - in: path
           name: id
@@ -247,6 +257,8 @@ paths:
       operationId: teachersList
       summary: List all teachers
       tags: [teachers]
+      security:
+        - bearerAuth: []
       parameters:
         - in: query
           name: perPage
@@ -276,6 +288,8 @@ paths:
       operationId: teachersCreate
       summary: Create a new teacher
       tags: [teachers]
+      security:
+        - bearerAuth: []
       requestBody:
         required: true
         content:
@@ -307,6 +321,8 @@ paths:
       operationId: teachersGet
       summary: Get a teacher by its CUID
       tags: [teachers]
+      security:
+        - bearerAuth: []
       parameters:
         - in: path
           name: id
@@ -342,6 +358,8 @@ paths:
       operationId: teachersUpdate
       summary: Update a teacher by its CUID
       tags: [teachers]
+      security:
+        - bearerAuth: []
       parameters:
         - in: path
           name: id
@@ -384,6 +402,8 @@ paths:
       operationId: teachersDelete
       summary: Delete a teacher by its CUID
       tags: [teachers]
+      security:
+        - bearerAuth: []
       parameters:
         - in: path
           name: id
@@ -405,6 +425,190 @@ paths:
                     example: true
         404:
           description: No teacher was found with that ID.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        500:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /v1/students:
+    get:
+      operationId: studentsList
+      summary: List all students
+      tags: [students]
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: query
+          name: perPage
+          schema:
+            type: integer
+          description: The number of results to retrieve in each page.
+        - in: query
+          name: page
+          schema:
+            type: integer
+          description: The page to load.
+      responses:
+        '200':
+          description: A list of students and pagination details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StudentsListResponse'
+        500:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+    post:
+      operationId: studentsCreate
+      summary: Create a new student
+      tags: [students]
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/StudentsCreateRequest'
+      responses:
+        '201':
+          description: The created student, populated with metadata.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StudentsCreateResponse'
+        '400':
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        500:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /v1/students/{id}:
+    get:
+      operationId: studentsGet
+      summary: Get a student by its CUID
+      tags: [students]
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          schema:
+            $ref: '#/components/schemas/Cuid'
+          required: true
+      responses:
+        '200':
+          description: The student found for the CUID provided.
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - student
+                properties:
+                  teacher:
+                    $ref: '#/components/schemas/Student'
+        404:
+          description: No student was found with that ID.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        500:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+    patch:
+      operationId: studentsUpdate
+      summary: Update a student by its CUID
+      tags: [students]
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          schema:
+            $ref: '#/components/schemas/Cuid'
+          required: true
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/StudentsUpdateRequest'
+      responses:
+        '200':
+          description: The student found for the CUID provided.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StudentsUpdateResponse'
+        400:
+          description: There was a problem with your input.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        404:
+          description: No teacher was found with that ID.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        500:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+    delete:
+      operationId: studentsDelete
+      summary: Delete a student by its CUID
+      tags: [students]
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          schema:
+            $ref: '#/components/schemas/Cuid'
+          required: true
+      responses:
+        '200':
+          description: The student found for the CUID provided.
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - ok
+                properties:
+                  ok:
+                    type: boolean
+                    example: true
+        404:
+          description: No student was found with that ID.
           content:
             application/json:
               schema:
@@ -583,6 +787,76 @@ components:
       properties:
         class:
           $ref: '#/components/schemas/Class'
+
+    Student:
+      type: object
+      required:
+        - id
+        - fullName
+        - createdAt
+        - updatedAt
+      properties:
+        id:
+          $ref: '#/components/schemas/Cuid'
+        fullName:
+          type: string
+          example: John Doe
+        createdAt:
+          $ref: '#/components/schemas/DateTime'
+        updatedAt:
+          $ref: '#/components/schemas/DateTime'
+
+    StudentList:
+      description: An array of Students
+      type: array
+      items:
+        $ref: '#/components/schemas/Student'
+
+    StudentsListResponse:
+      description: The response for the /v1/teachers endpoint
+      type: object
+      required:
+        - pagination
+        - students
+      properties:
+        pagination:
+          $ref: '#/components/schemas/PaginationData'
+        students:
+          $ref: '#/components/schemas/StudentList'
+
+    StudentsCreateRequest:
+      type: object
+      required:
+        - fullName
+      properties:
+        fullName:
+          type: string
+          example: John Doe
+
+    StudentsCreateResponse:
+      type: object
+      required:
+        - student
+      properties:
+        student:
+          $ref: '#/components/schemas/Student'
+
+    StudentsUpdateRequest:
+      type: object
+      required:
+        - fullName
+      properties:
+        fullName:
+          type: string
+          example: John Doe
+
+    StudentsUpdateResponse:
+      type: object
+      required:
+        - student
+      properties:
+        student:
+          $ref: '#/components/schemas/Student'
 
     Teacher:
       type: object

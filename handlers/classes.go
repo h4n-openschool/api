@@ -1,7 +1,6 @@
 package handlers
 
 import (
-	"encoding/json"
 	"errors"
 	"net/http"
 
@@ -9,11 +8,9 @@ import (
 	"github.com/gosimple/slug"
 	"github.com/h4n-openschool/api/api"
 	"github.com/h4n-openschool/api/auth"
-	"github.com/h4n-openschool/api/bus"
 	"github.com/h4n-openschool/api/models"
 	"github.com/h4n-openschool/api/repos/classes"
 	"github.com/h4n-openschool/api/utils"
-	"github.com/rabbitmq/amqp091-go"
 )
 
 // ClassesList implements the classesList operation from the OpenAPI
@@ -76,37 +73,7 @@ func (i *OpenSchoolImpl) ClassesCreate(ctx *gin.Context) {
 		in.Description = body.Description
 	}
 
-	c, q, err := i.Bus.ChannelQueue()
-	if err != nil {
-		_ = ctx.AbortWithError(http.StatusInternalServerError, err)
-	}
-
 	class, err := i.ClassRepository.Create(in)
-	if err != nil {
-		_ = ctx.AbortWithError(http.StatusInternalServerError, err)
-	}
-
-	ev := bus.Event[*models.Class]{
-		Data: class,
-		Metadata: bus.EventMeta{
-			Type:     "create",
-			Resource: "class",
-		},
-	}
-
-	j, _ := json.Marshal(ev)
-
-	err = c.PublishWithContext(
-		ctx.Request.Context(),
-		"",
-		q.Name,
-		false,
-		false,
-		amqp091.Publishing{
-			ContentType: "application/json",
-			Body:        j,
-		},
-	)
 	if err != nil {
 		_ = ctx.AbortWithError(http.StatusInternalServerError, err)
 	}
