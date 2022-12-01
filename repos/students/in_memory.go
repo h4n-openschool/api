@@ -6,6 +6,7 @@ import (
 
 	"github.com/go-faker/faker/v4"
 	"github.com/h4n-openschool/api/models"
+	"github.com/h4n-openschool/api/repos/classes"
 	"github.com/h4n-openschool/api/utils"
 	"github.com/lucsky/cuid"
 )
@@ -23,22 +24,32 @@ type InMemoryStudentRepository struct {
 
 // NewInMemoryStudentRepository creates a new instance of
 // [NewInMemoryStudentRepository]
-func NewInMemoryStudentRepository(itemCount int) InMemoryStudentRepository {
-	var items []models.Student
+func NewInMemoryStudentRepository(cr classes.ClassRepository, itemCount int) InMemoryStudentRepository {
+  classes, _ := cr.GetAll(utils.NewPaginationQuery())
 
-	// Generate studentes in-memory to use with repo methods.
-	for i := 0; i < itemCount; i++ {
-		id := cuid.New()
+  var items []models.Student
+  for _, c := range classes {
+    var classStudents []string
 
-		items = append(items, models.Student{
-			BaseMetadata: models.BaseMetadata{
-				Id:        id,
-				CreatedAt: time.Now(),
-				UpdatedAt: time.Now(),
-			},
-			FullName: faker.FirstName() + " " + faker.LastName(),
-		})
-	}
+    // Generate studentes in-memory to use with repo methods.
+    for i := 0; i < itemCount; i++ {
+      id := cuid.New()
+
+      items = append(items, models.Student{
+        BaseMetadata: models.BaseMetadata{
+          Id:        id,
+          CreatedAt: time.Now(),
+          UpdatedAt: time.Now(),
+        },
+        FullName: faker.FirstName() + " " + faker.LastName(),
+      })
+
+      classStudents = append(classStudents, id)
+    }
+
+    c.StudentIds = classStudents
+    _, _ = cr.Update(&c)
+  }
 
 	// Return the new repository to the caller
 	return InMemoryStudentRepository{Items: items}

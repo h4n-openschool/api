@@ -32,20 +32,11 @@ nix develop
 This process could take a while the first time, as it will be downloading copies
 of required development tooling.
 
-Then, you need to start a copy of RabbitMQ in Docker.
-
-```shell
-docker run \
-    -d \             # run in the background
-    -p 5672:5672 \   # the amqp port
-    rabbitmq
-```
-
-Now, you can run the server software (still inside the nix shell).
+Now, you can run the server software.
 
 ```shell
 go run . serve
 ```
 
-By default, it will be running on port 8001, bound only to the local interface.
+By default, it will be running on port 8080, bound only to the local interface.
 

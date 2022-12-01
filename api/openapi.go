@@ -40,9 +40,16 @@ type Class struct {
 	Description string   `json:"description"`
 	DisplayName string   `json:"displayName"`
 
+	// EndDate An RFC3339 date/time string
+	EndDate DateTime `json:"endDate"`
+
 	// Id A cuid
 	Id   Cuid   `json:"id"`
 	Name string `json:"name"`
+
+	// StartDate An RFC3339 date/time string
+	StartDate  DateTime `json:"startDate"`
+	StudentIds *[]Cuid  `json:"studentIds,omitempty"`
 
 	// UpdatedAt An RFC3339 date/time string
 	UpdatedAt DateTime `json:"updatedAt"`
@@ -59,8 +66,17 @@ type ClassesCreateRequest struct {
 	// DisplayName The display name of the Class
 	DisplayName string `json:"displayName"`
 
+	// EndDate An RFC3339 date/time string
+	EndDate *DateTime `json:"endDate,omitempty"`
+
 	// Name The name of the Class
 	Name *string `json:"name,omitempty"`
+
+	// StartDate An RFC3339 date/time string
+	StartDate *DateTime `json:"startDate,omitempty"`
+
+	// StudentIds A list of student IDs.
+	StudentIds *[]Cuid `json:"studentIds,omitempty"`
 }
 
 // ClassesCreateResponse defines model for ClassesCreateResponse.
@@ -83,8 +99,17 @@ type ClassesUpdateRequest struct {
 	// DisplayName The display name of the Class
 	DisplayName *string `json:"displayName,omitempty"`
 
+	// EndDate An RFC3339 date/time string
+	EndDate *DateTime `json:"endDate,omitempty"`
+
 	// Name The name of the Class
 	Name *string `json:"name,omitempty"`
+
+	// StartDate An RFC3339 date/time string
+	StartDate *DateTime `json:"startDate,omitempty"`
+
+	// StudentIds An array of Student IDs.
+	StudentIds *[]Cuid `json:"studentIds,omitempty"`
 }
 
 // ClassesUpdateResponse defines model for ClassesUpdateResponse.
@@ -107,6 +132,57 @@ type Error struct {
 	Message string `json:"message"`
 }
 
+// Grade defines model for Grade.
+type Grade struct {
+	// CreatedAt An RFC3339 date/time string
+	CreatedAt DateTime `json:"createdAt"`
+
+	// Id A cuid
+	Id Cuid `json:"id"`
+
+	// StudentId A cuid
+	StudentId Cuid `json:"studentId"`
+
+	// UpdatedAt An RFC3339 date/time string
+	UpdatedAt DateTime `json:"updatedAt"`
+	Value     int      `json:"value"`
+}
+
+// GradeList An array of Grades
+type GradeList = []Grade
+
+// GradesCreateRequest defines model for GradesCreateRequest.
+type GradesCreateRequest struct {
+	// StudentId A cuid
+	StudentId Cuid `json:"studentId"`
+
+	// Value The grade for the provided student.
+	Value int `json:"value"`
+}
+
+// GradesCreateResponse defines model for GradesCreateResponse.
+type GradesCreateResponse struct {
+	Grade Grade `json:"grade"`
+}
+
+// GradesListResponse The response for the /v1/classes/{id}/grades endpoint
+type GradesListResponse struct {
+	// Grades An array of Grades
+	Grades     GradeList      `json:"grades"`
+	Pagination PaginationData `json:"pagination"`
+}
+
+// GradesUpdateRequest defines model for GradesUpdateRequest.
+type GradesUpdateRequest struct {
+	// Value The grade for the provided student.
+	Value *int `json:"value,omitempty"`
+}
+
+// GradesUpdateResponse defines model for GradesUpdateResponse.
+type GradesUpdateResponse struct {
+	Grade Grade `json:"grade"`
+}
+
 // PaginationData defines model for PaginationData.
 type PaginationData struct {
 	FirstUrl string `json:"firstUrl"`
@@ -120,6 +196,9 @@ type PaginationData struct {
 
 // Student defines model for Student.
 type Student struct {
+	// ClassId A cuid
+	ClassId *Cuid `json:"classId,omitempty"`
+
 	// CreatedAt An RFC3339 date/time string
 	CreatedAt DateTime `json:"createdAt"`
 	FullName  string   `json:"fullName"`
@@ -218,6 +297,15 @@ type ClassesListParams struct {
 	Page *int `form:"page,omitempty" json:"page,omitempty"`
 }
 
+// GradesListParams defines parameters for GradesList.
+type GradesListParams struct {
+	// PerPage The number of results to retrieve in each page.
+	PerPage *int `form:"perPage,omitempty" json:"perPage,omitempty"`
+
+	// Page The page to load.
+	Page *int `form:"page,omitempty" json:"page,omitempty"`
+}
+
 // StudentsListParams defines parameters for StudentsList.
 type StudentsListParams struct {
 	// PerPage The number of results to retrieve in each page.
@@ -244,6 +332,12 @@ type ClassesCreateJSONRequestBody = ClassesCreateRequest
 
 // ClassesUpdateJSONRequestBody defines body for ClassesUpdate for application/json ContentType.
 type ClassesUpdateJSONRequestBody = ClassesUpdateRequest
+
+// GradesCreateJSONRequestBody defines body for GradesCreate for application/json ContentType.
+type GradesCreateJSONRequestBody = GradesCreateRequest
+
+// GradesUpdateJSONRequestBody defines body for GradesUpdate for application/json ContentType.
+type GradesUpdateJSONRequestBody = GradesUpdateRequest
 
 // StudentsCreateJSONRequestBody defines body for StudentsCreate for application/json ContentType.
 type StudentsCreateJSONRequestBody = StudentsCreateRequest
@@ -280,6 +374,21 @@ type ServerInterface interface {
 	// Update a class by its CUID
 	// (PATCH /v1/classes/{id})
 	ClassesUpdate(c *gin.Context, id Cuid)
+	// List all grades
+	// (GET /v1/classes/{id}/grades)
+	GradesList(c *gin.Context, id Cuid, params GradesListParams)
+	// Store a new grade
+	// (POST /v1/classes/{id}/grades)
+	GradesCreate(c *gin.Context, id Cuid)
+	// Delete a grade by its CUID
+	// (DELETE /v1/classes/{id}/grades/{grade})
+	GradesDelete(c *gin.Context, id Cuid, grade Cuid)
+	// Get a grade by its CUID and class CUID
+	// (GET /v1/classes/{id}/grades/{grade})
+	GradesGet(c *gin.Context, id Cuid, grade Cuid)
+	// Update a grade by its CUID
+	// (PATCH /v1/classes/{id}/grades/{grade})
+	GradesUpdate(c *gin.Context, id Cuid, grade Cuid)
 	// List all students
 	// (GET /v1/students)
 	StudentsList(c *gin.Context, params StudentsListParams)
@@ -455,6 +564,167 @@ func (siw *ServerInterfaceWrapper) ClassesUpdate(c *gin.Context) {
 	}
 
 	siw.Handler.ClassesUpdate(c, id)
+}
+
+// GradesList operation middleware
+func (siw *ServerInterfaceWrapper) GradesList(c *gin.Context) {
+
+	var err error
+
+	// ------------- Path parameter "id" -------------
+	var id Cuid
+
+	err = runtime.BindStyledParameter("simple", false, "id", c.Param("id"), &id)
+	if err != nil {
+		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter id: %s", err), http.StatusBadRequest)
+		return
+	}
+
+	c.Set(BearerAuthScopes, []string{""})
+
+	// Parameter object where we will unmarshal all parameters from the context
+	var params GradesListParams
+
+	// ------------- Optional query parameter "perPage" -------------
+
+	err = runtime.BindQueryParameter("form", true, false, "perPage", c.Request.URL.Query(), &params.PerPage)
+	if err != nil {
+		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter perPage: %s", err), http.StatusBadRequest)
+		return
+	}
+
+	// ------------- Optional query parameter "page" -------------
+
+	err = runtime.BindQueryParameter("form", true, false, "page", c.Request.URL.Query(), &params.Page)
+	if err != nil {
+		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter page: %s", err), http.StatusBadRequest)
+		return
+	}
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		middleware(c)
+	}
+
+	siw.Handler.GradesList(c, id, params)
+}
+
+// GradesCreate operation middleware
+func (siw *ServerInterfaceWrapper) GradesCreate(c *gin.Context) {
+
+	var err error
+
+	// ------------- Path parameter "id" -------------
+	var id Cuid
+
+	err = runtime.BindStyledParameter("simple", false, "id", c.Param("id"), &id)
+	if err != nil {
+		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter id: %s", err), http.StatusBadRequest)
+		return
+	}
+
+	c.Set(BearerAuthScopes, []string{""})
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		middleware(c)
+	}
+
+	siw.Handler.GradesCreate(c, id)
+}
+
+// GradesDelete operation middleware
+func (siw *ServerInterfaceWrapper) GradesDelete(c *gin.Context) {
+
+	var err error
+
+	// ------------- Path parameter "id" -------------
+	var id Cuid
+
+	err = runtime.BindStyledParameter("simple", false, "id", c.Param("id"), &id)
+	if err != nil {
+		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter id: %s", err), http.StatusBadRequest)
+		return
+	}
+
+	// ------------- Path parameter "grade" -------------
+	var grade Cuid
+
+	err = runtime.BindStyledParameter("simple", false, "grade", c.Param("grade"), &grade)
+	if err != nil {
+		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter grade: %s", err), http.StatusBadRequest)
+		return
+	}
+
+	c.Set(BearerAuthScopes, []string{""})
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		middleware(c)
+	}
+
+	siw.Handler.GradesDelete(c, id, grade)
+}
+
+// GradesGet operation middleware
+func (siw *ServerInterfaceWrapper) GradesGet(c *gin.Context) {
+
+	var err error
+
+	// ------------- Path parameter "id" -------------
+	var id Cuid
+
+	err = runtime.BindStyledParameter("simple", false, "id", c.Param("id"), &id)
+	if err != nil {
+		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter id: %s", err), http.StatusBadRequest)
+		return
+	}
+
+	// ------------- Path parameter "grade" -------------
+	var grade Cuid
+
+	err = runtime.BindStyledParameter("simple", false, "grade", c.Param("grade"), &grade)
+	if err != nil {
+		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter grade: %s", err), http.StatusBadRequest)
+		return
+	}
+
+	c.Set(BearerAuthScopes, []string{""})
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		middleware(c)
+	}
+
+	siw.Handler.GradesGet(c, id, grade)
+}
+
+// GradesUpdate operation middleware
+func (siw *ServerInterfaceWrapper) GradesUpdate(c *gin.Context) {
+
+	var err error
+
+	// ------------- Path parameter "id" -------------
+	var id Cuid
+
+	err = runtime.BindStyledParameter("simple", false, "id", c.Param("id"), &id)
+	if err != nil {
+		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter id: %s", err), http.StatusBadRequest)
+		return
+	}
+
+	// ------------- Path parameter "grade" -------------
+	var grade Cuid
+
+	err = runtime.BindStyledParameter("simple", false, "grade", c.Param("grade"), &grade)
+	if err != nil {
+		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter grade: %s", err), http.StatusBadRequest)
+		return
+	}
+
+	c.Set(BearerAuthScopes, []string{""})
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		middleware(c)
+	}
+
+	siw.Handler.GradesUpdate(c, id, grade)
 }
 
 // StudentsList operation middleware
@@ -728,6 +998,16 @@ func RegisterHandlersWithOptions(router *gin.Engine, si ServerInterface, options
 
 	router.PATCH(options.BaseURL+"/v1/classes/:id", wrapper.ClassesUpdate)
 
+	router.GET(options.BaseURL+"/v1/classes/:id/grades", wrapper.GradesList)
+
+	router.POST(options.BaseURL+"/v1/classes/:id/grades", wrapper.GradesCreate)
+
+	router.DELETE(options.BaseURL+"/v1/classes/:id/grades/:grade", wrapper.GradesDelete)
+
+	router.GET(options.BaseURL+"/v1/classes/:id/grades/:grade", wrapper.GradesGet)
+
+	router.PATCH(options.BaseURL+"/v1/classes/:id/grades/:grade", wrapper.GradesUpdate)
+
 	router.GET(options.BaseURL+"/v1/students", wrapper.StudentsList)
 
 	router.POST(options.BaseURL+"/v1/students", wrapper.StudentsCreate)
@@ -754,41 +1034,47 @@ func RegisterHandlersWithOptions(router *gin.Engine, si ServerInterface, options
 // Base64 encoded, gzipped, json marshaled Swagger object
 var swaggerSpec = []string{
 
-	"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",
-	"WecQk2lHAAA=",
+	"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",
+	"OGJCzt/6b33v/vL+/wEAAP//6tTAmMpfAAA=",
 }
 
 // GetSwagger returns the content of the embedded swagger specification file

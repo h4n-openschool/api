@@ -3,6 +3,7 @@ package handlers
 import (
 	"errors"
 	"net/http"
+	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/gosimple/slug"
@@ -16,9 +17,9 @@ import (
 // ClassesList implements the classesList operation from the OpenAPI
 // specification in [../api/spec.yaml].
 func (i *OpenSchoolImpl) ClassesList(ctx *gin.Context, params api.ClassesListParams) {
-  if ok := auth.MustAuthenticate(ctx, i.TeacherRepository); ok {
-    return
-  }
+	if ok := auth.MustAuthenticate(ctx, i.TeacherRepository); ok {
+		return
+	}
 
 	// Read pagination options from the ClassesListParams object
 	pagination := utils.NewPaginationQuery()
@@ -59,8 +60,20 @@ func (i *OpenSchoolImpl) ClassesCreate(ctx *gin.Context) {
 		_ = ctx.AbortWithError(400, err)
 	}
 
+	sd, err := time.Parse(time.RFC3339, *body.StartDate)
+	if err != nil {
+		_ = ctx.AbortWithError(400, err)
+	}
+
+	ed, err := time.Parse(time.RFC3339, *body.EndDate)
+	if err != nil {
+		_ = ctx.AbortWithError(400, err)
+	}
+
 	in := models.Class{
 		DisplayName: body.DisplayName,
+		StartDate:   sd,
+		EndDate:     ed,
 	}
 
 	if body.Name != nil {
@@ -105,11 +118,24 @@ func (i *OpenSchoolImpl) ClassesUpdate(ctx *gin.Context, id api.Cuid) {
 	var body api.ClassesUpdateJSONRequestBody
 	_ = ctx.Bind(&body)
 
-	class := &models.Class{}
+	sd, err := time.Parse(time.RFC3339, *body.StartDate)
+	if err != nil {
+		_ = ctx.AbortWithError(400, err)
+	}
+
+	ed, err := time.Parse(time.RFC3339, *body.EndDate)
+	if err != nil {
+		_ = ctx.AbortWithError(400, err)
+	}
+
+	class := &models.Class{
+    StartDate: sd,
+    EndDate: ed,
+  }
 	class.Id = id
 	class = class.ReconcileWithApiClass(body.Description, body.DisplayName)
 
-	class, err := i.ClassRepository.Update(class)
+	class, err = i.ClassRepository.Update(class)
 	if err != nil {
 		_ = ctx.AbortWithError(http.StatusInternalServerError, err)
 	}

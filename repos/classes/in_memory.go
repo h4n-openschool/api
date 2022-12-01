@@ -40,6 +40,8 @@ func NewInMemoryClassRepository(itemCount int) InMemoryClassRepository {
 			Name:        fmt.Sprintf(`class-%v`, i),
 			DisplayName: fmt.Sprintf(`Class %v`, i),
 			Description: &desc,
+			StartDate:   time.Now(),
+			EndDate:     time.Now().Add((24 * time.Hour) * 4),
 		})
 	}
 
@@ -89,6 +91,10 @@ func (r *InMemoryClassRepository) Update(class *models.Class) (*models.Class, er
 				v.Description = class.Description
 			}
 
+      v.StartDate = class.StartDate
+      v.EndDate = class.EndDate
+
+			v.StudentIds = class.StudentIds
 			v.UpdatedAt = time.Now()
 
 			found = &v

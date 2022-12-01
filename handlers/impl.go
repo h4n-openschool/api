@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"github.com/h4n-openschool/api/repos/classes"
+	"github.com/h4n-openschool/api/repos/grades"
 	"github.com/h4n-openschool/api/repos/students"
 	"github.com/h4n-openschool/api/repos/teachers"
 	"go.uber.org/zap"
@@ -13,5 +14,6 @@ type OpenSchoolImpl struct {
 	StudentRepository students.StudentRepository
 	ClassRepository   classes.ClassRepository
 	TeacherRepository teachers.TeacherRepository
+	GradeRepository   grades.GradeRepository
 	Logger            *zap.Logger
 }

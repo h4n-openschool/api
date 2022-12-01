@@ -252,6 +252,216 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
 
+  /v1/classes/{id}/grades:
+    get:
+      operationId: gradesList
+      summary: List all grades
+      tags: [classes, grades]
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: query
+          name: perPage
+          schema:
+            type: integer
+          description: The number of results to retrieve in each page.
+        - in: query
+          name: page
+          schema:
+            type: integer
+          description: The page to load.
+        - in: path
+          name: id
+          schema:
+            $ref: '#/components/schemas/Cuid'
+          required: true
+      responses:
+        '200':
+          description: A list of classes and pagination details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GradesListResponse'
+        500:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+    post:
+      operationId: gradesCreate
+      summary: Store a new grade
+      tags: [classes, grades]
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          schema:
+            $ref: '#/components/schemas/Cuid'
+          required: true
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GradesCreateRequest'
+      responses:
+        '201':
+          description: The created grade, populated with metadata.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GradesCreateResponse'
+        '400':
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        500:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /v1/classes/{id}/grades/{grade}:
+    get:
+      operationId: gradesGet
+      summary: Get a grade by its CUID and class CUID
+      tags: [classes, grades]
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          schema:
+            $ref: '#/components/schemas/Cuid'
+          required: true
+        - in: path
+          name: grade
+          schema:
+            $ref: '#/components/schemas/Cuid'
+          required: true
+      responses:
+        '200':
+          description: The grade found for the CUID provided.
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - grade
+                properties:
+                  teacher:
+                    $ref: '#/components/schemas/Grade'
+        404:
+          description: No grade was found with that ID.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        500:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+    patch:
+      operationId: gradesUpdate
+      summary: Update a grade by its CUID
+      tags: [classes, grades]
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          schema:
+            $ref: '#/components/schemas/Cuid'
+          required: true
+        - in: path
+          name: grade
+          schema:
+            $ref: '#/components/schemas/Cuid'
+          required: true
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GradesUpdateRequest'
+      responses:
+        '200':
+          description: The grade found for the CUID provided.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GradesUpdateResponse'
+        400:
+          description: There was a problem with your input.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        404:
+          description: No grade was found with that ID.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        500:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+    delete:
+      operationId: gradesDelete
+      summary: Delete a grade by its CUID
+      tags: [classes, grades]
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          schema:
+            $ref: '#/components/schemas/Cuid'
+          required: true
+        - in: path
+          name: grade
+          schema:
+            $ref: '#/components/schemas/Cuid'
+          required: true
+      responses:
+        '200':
+          description: The grade found for the CUID provided.
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - ok
+                properties:
+                  ok:
+                    type: boolean
+                    example: true
+        404:
+          description: No grade was found with that ID.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        500:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
   /v1/teachers:
     get:
       operationId: teachersList
@@ -523,7 +733,7 @@ paths:
                 required:
                   - student
                 properties:
-                  teacher:
+                  student:
                     $ref: '#/components/schemas/Student'
         404:
           description: No student was found with that ID.
@@ -694,6 +904,82 @@ components:
         token:
           type: string
 
+    Grade:
+      type: object
+      required:
+        - id
+        - studentId
+        - value
+        - createdAt
+        - updatedAt
+      properties:
+        id:
+          $ref: '#/components/schemas/Cuid'
+        studentId:
+          $ref: '#/components/schemas/Cuid'
+        value:
+          type: integer
+          example: 7
+        createdAt:
+          $ref: '#/components/schemas/DateTime'
+        updatedAt:
+          $ref: '#/components/schemas/DateTime'
+
+    GradeList:
+      description: An array of Grades
+      type: array
+      items:
+        $ref: '#/components/schemas/Grade'
+
+    GradesListResponse:
+      description: The response for the /v1/classes/{id}/grades endpoint
+      type: object
+      required:
+        - pagination
+        - grades
+      properties:
+        pagination:
+          $ref: '#/components/schemas/PaginationData'
+        grades:
+          $ref: '#/components/schemas/GradeList'
+
+    GradesCreateRequest:
+      type: object
+      required:
+        - studentId
+        - value
+      properties:
+        studentId:
+          $ref: '#/components/schemas/Cuid'
+        value:
+          type: integer
+          description: The grade for the provided student.
+          example: 7
+
+    GradesCreateResponse:
+      type: object
+      required:
+        - grade
+      properties:
+        grade:
+          $ref: '#/components/schemas/Grade'
+
+    GradesUpdateRequest:
+      type: object
+      properties:
+        value:
+          type: integer
+          description: The grade for the provided student.
+          example: 7
+
+    GradesUpdateResponse:
+      type: object
+      required:
+        - grade
+      properties:
+        grade:
+          $ref: '#/components/schemas/Grade'
+
     Class:
       type: object
       required:
@@ -701,6 +987,8 @@ components:
         - name
         - displayName
         - description
+        - startDate
+        - endDate
         - createdAt
         - updatedAt
       properties:
@@ -715,6 +1003,14 @@ components:
         description:
           type: string
           example: Basic maths class
+        studentIds:
+          type: array
+          items:
+            $ref: '#/components/schemas/Cuid'
+        startDate:
+          $ref: '#/components/schemas/DateTime'
+        endDate:
+          $ref: '#/components/schemas/DateTime'
         createdAt:
           $ref: '#/components/schemas/DateTime'
         updatedAt:
@@ -755,6 +1051,15 @@ components:
           type: string
           description: The description of the Class
           example: Basic maths class
+        studentIds:
+          type: array
+          description: A list of student IDs.
+          items:
+            $ref: '#/components/schemas/Cuid'
+        startDate:
+          $ref: '#/components/schemas/DateTime'
+        endDate:
+          $ref: '#/components/schemas/DateTime'
 
     ClassesCreateResponse:
       type: object
@@ -779,6 +1084,15 @@ components:
           type: string
           description: The description of the Class
           example: Basic maths class
+        studentIds:
+          type: array
+          description: An array of Student IDs.
+          items:
+            $ref: '#/components/schemas/Cuid'
+        startDate:
+          $ref: '#/components/schemas/DateTime'
+        endDate:
+          $ref: '#/components/schemas/DateTime'
 
     ClassesUpdateResponse:
       type: object
@@ -801,6 +1115,8 @@ components:
         fullName:
           type: string
           example: John Doe
+        classId:
+          $ref: '#/components/schemas/Cuid'
         createdAt:
           $ref: '#/components/schemas/DateTime'
         updatedAt:

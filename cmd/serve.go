@@ -3,9 +3,9 @@ package cmd
 import (
 	"github.com/gin-gonic/gin"
 	"github.com/h4n-openschool/api/api"
-	"github.com/h4n-openschool/api/bus"
 	"github.com/h4n-openschool/api/handlers"
 	classRepos "github.com/h4n-openschool/api/repos/classes"
+	gradeRepos "github.com/h4n-openschool/api/repos/grades"
 	studentRepos "github.com/h4n-openschool/api/repos/students"
 	teacherRepos "github.com/h4n-openschool/api/repos/teachers"
 	"github.com/h4n-openschool/api/server"
@@ -26,14 +26,17 @@ var serveCmd = &cobra.Command{
 
 		logger, _ := zap.NewDevelopment()
 
-		// Instantiate a new in-memory Teacher repository, generating 50 records.
+		// Instantiate a new in-memory Teacher repository, generating 10 records.
 		tr := teacherRepos.NewInMemoryTeacherRepository(10)
 
-		// Instantiate a new in-memory Class repository, generating 50 records.
+		// Instantiate a new in-memory Class repository, generating 10 records.
 		cr := classRepos.NewInMemoryClassRepository(10)
 
 		// Instantiate a new in-memory Student repository, generating 250 records.
-		sr := studentRepos.NewInMemoryStudentRepository(4 * 30)
+		sr := studentRepos.NewInMemoryStudentRepository(&cr, 30)
+
+		// Instantiate a new in-memory Grade repository, generating 1 record per student.
+		gr := gradeRepos.NewInMemoryGradeRepository(&cr)
 
 		// Create a new Gin router instance with the required middleware already
 		// bootstrapped.
@@ -45,6 +48,7 @@ var serveCmd = &cobra.Command{
 			ClassRepository:   &cr,
 			TeacherRepository: &tr,
 			StudentRepository: &sr,
+			GradeRepository:   &gr,
 			Logger:            logger,
 		}
 
